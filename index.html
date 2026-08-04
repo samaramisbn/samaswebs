@@ -8,6 +8,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="description" content="Sama's Webs — Soluciones sencillas y personalizadas para digitalizar pequeños negocios: webs, landing pages, reservas y guías digitales." />
+    <!-- Form endpoint: Formsubmit (envía a ssamaramiss@gmail.com) -->
+    <meta name="form-endpoint" content="https://formsubmit.co/ssamaramiss@gmail.com" />
     <title>Sama's Webs — Tecnología sencilla para pequeños negocios</title>
 
     <!-- Tipografía moderna (Inter) -->
@@ -211,6 +213,10 @@
           <p class="section__lead">Cuéntanos en pocas palabras tu proyecto y te responderemos con una propuesta clara.</p>
 
           <form id="contact-form" class="contact-form" novalidate>
+            <!-- Hidden helpers for Formsubmit (subject, captcha disable) -->
+            <input type="hidden" name="_subject" value="Nuevo mensaje desde Sama's Webs" />
+            <input type="hidden" name="_captcha" value="false" />
+
             <div style="display:flex;gap:1rem;flex-wrap:wrap;">
               <label style="flex:1;min-width:180px">
                 <span class="muted">Nombre</span>
