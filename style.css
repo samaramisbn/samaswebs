@@ -83,7 +83,7 @@ img{max-width:100%;height:auto;display:block}
 .skip-link:focus{transform:none}
 
 /* NAVBAR */
-.nav-wrapper{position:sticky;top:0;z-index:900;background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7));backdrop-filter:blur(6px);border-bottom:1px solid rgba(42,39,48,0.06)}
+.nav-wrapper{position:sticky;top:0;z-index:900;background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7));backdrop-filter:blur(6px);border-bottom:1px solid rgba(42,39,48,0.04)}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:0.6rem var(--container-padding);gap:1rem}
 .nav__brand{display:flex;align-items:center}
 .brand{display:flex;align-items:center;gap:0.75rem}
@@ -197,5 +197,17 @@ a:focus,button:focus{outline:3px solid rgba(124,87,200,0.12);outline-offset:2px}
 /* Utility spacing */
 .mt-1{margin-top:0.5rem}
 .mt-2{margin-top:1rem}
+
+/* Logo background and responsive tweaks */
+/* Ensure the logo is visible even if the <img> fails; use the uploaded Logo.png in repo root */
+.brand{position:relative;display:flex;align-items:center;gap:0.75rem}
+.brand__logo{width:56px;height:56px;flex:0 0 56px;border-radius:10px;background-image:url('Logo.png');background-size:contain;background-repeat:no-repeat;background-position:center;display:inline-block}
+/* If an <img> exists inside .brand, hide it to avoid duplication (we use CSS background for consistent sizing) */
+.brand img.brand__logo{display:none}
+
+@media (max-width:760px){
+  .brand__logo{width:44px;height:44px}
+  .brand__text{display:none}
+}
 
 /* End of style.css */
