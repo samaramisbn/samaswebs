@@ -1,1 +1,220 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <!--
+      index.html para Sama's Webs
+      Diseño: minimalista, moderno, premium
+      Nota: Los colores de branding se deben definir en style.css como variables :root.
+      El logo opcional debe ubicarse en: assets/logo.png (colócalo tú si lo deseas)
+    -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="Sama's Webs — WEBSITES · LANDING PAGES · DIGITAL SOLUTIONS. Desarrollo de soluciones digitales para empresas y alojamientos turísticos." />
+    <title>Sama's Webs — Soluciones digitales para hacer crecer tu negocio</title>
 
+    <!-- Tipografía moderna (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="script.js"></script>
+  </head>
+
+  <body>
+    <!-- Skip link para accesibilidad -->
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+
+    <!-- NAVBAR fija -->
+    <header class="nav-wrapper" role="banner">
+      <nav class="nav container" aria-label="Navegación principal">
+        <div class="nav__brand">
+          <!-- Usar el logo en assets/logo.png si está disponible -->
+          <a href="/" class="brand" aria-label="Sama's Webs - Inicio">
+            <img src="assets/logo.png" alt="Sama's Webs" class="brand__logo" onerror="this.style.display='none'" />
+            <div class="brand__text">
+              <strong class="brand__name">Sama's Webs</strong>
+              <span class="brand__tagline">WEBSITES · LANDING PAGES · DIGITAL SOLUTIONS</span>
+            </div>
+          </a>
+        </div>
+
+        <ul class="nav__links" role="menubar" aria-hidden="false">
+          <li role="none"><a role="menuitem" href="#servicios">Servicios</a></li>
+          <li role="none"><a role="menuitem" href="#por-que">Por qué elegirnos</a></li>
+          <li role="none"><a role="menuitem" href="#sectores">Sectores</a></li>
+          <li role="none"><a role="menuitem" href="#portfolio">Portfolio</a></li>
+          <li role="none"><a role="menuitem" href="#contacto" class="btn btn--ghost">Contacto</a></li>
+        </ul>
+
+        <button class="nav__toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú">
+          <span class="hamburger" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <!-- Mobile menu (visible en pantallas pequeñas; controlado por script.js) -->
+      <div id="mobile-menu" class="mobile-menu" hidden>
+        <ul>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#por-que">Por qué elegirnos</a></li>
+          <li><a href="#sectores">Sectores</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#contacto" class="btn btn--primary">Contacto</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- HERO de pantalla completa -->
+    <main id="main-content">
+      <section class="hero hero--full" aria-label="Hero">
+        <div class="container hero__inner">
+          <div class="hero__content">
+            <h1 class="hero__title">
+              Soluciones digitales diseñadas para hacer crecer tu negocio.
+            </h1>
+            <p class="hero__subtitle">
+              Desarrollo de sitios web profesionales, landing pages y herramientas digitales que mejoran tu presencia online y la experiencia del cliente.
+            </p>
+
+            <div class="hero__ctas">
+              <a href="#contacto" class="btn btn--primary" data-analytics="cta-contact">Solicitar presupuesto</a>
+              <a href="#portfolio" class="btn btn--secondary" data-analytics="cta-portfolio">Ver trabajos</a>
+            </div>
+
+            <ul class="hero__highlights" aria-hidden="true">
+              <li class="card card--floating">Diseño moderno</li>
+              <li class="card card--floating">UX optimizado</li>
+              <li class="card card--floating">Rendimiento y SEO</li>
+            </ul>
+          </div>
+
+          <figure class="hero__visual" aria-hidden="true">
+            <div class="mockup-glass">
+              <div class="mockup__window">
+                <div class="mockup__header"></div>
+                <div class="mockup__body"></div>
+              </div>
+            </div>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Sección corta de Servicios / Cards informativas -->
+      <section id="servicios" class="section section--cards" aria-label="Servicios">
+        <div class="container">
+          <h2 class="section__title">Qué hacemos</h2>
+          <p class="section__lead">Diseñamos y desarrollamos soluciones digitales adaptadas a tu sector y objetivos.</p>
+
+          <div class="cards">
+            <article class="card">
+              <h3 class="card__title">Webs Corporativas</h3>
+              <p class="card__desc">Presencia institucional con foco en marca, performance y conversiones.</p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">Landing Pages</h3>
+              <p class="card__desc">Páginas enfocadas en captación y ventas, optimizadas para campañas.</p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">Soluciones a medida</h3>
+              <p class="card__desc">Herramientas digitales (bookings, paneles, integraciones) pensadas para tu negocio.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- "Por qué elegir Sama's Webs" -->
+      <section id="por-que" class="section section--why" aria-label="Por qué elegir Sama's Webs">
+        <div class="container">
+          <h2 class="section__title">Por qué elegir Sama's Webs</h2>
+          <div class="grid grid--3">
+            <div class="feature">
+              <h3>Atención personalizada</h3>
+              <p>Relación directa con el equipo para un proceso ágil y adaptado a tus necesidades.</p>
+            </div>
+            <div class="feature">
+              <h3>Calidad técnica</h3>
+              <p>Codebase optimizada, accesible y preparada para escalar.</p>
+            </div>
+            <div class="feature">
+              <h3>Diseño con propósito</h3>
+              <p>Interfaces limpias que comunican solidez y generan confianza.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección dirigida a empresas y alojamientos turísticos -->
+      <section id="sectores" class="section section--sectors" aria-label="Sectores">
+        <div class="container">
+          <h2 class="section__title">Sectores a los que servimos</h2>
+
+          <div class="sectors">
+            <article class="sector-card">
+              <h3>Empresas y negocios</h3>
+              <p>Soluciones orientadas a marca, ventas B2B y generación de leads.</p>
+            </article>
+
+            <article class="sector-card">
+              <h3>Alojamientos turísticos</h3>
+              <p>Hoteles, apartamentos y alojamientos: reservas, integraciones y presencia que convierte.</p>
+            </article>
+
+            <article class="sector-card">
+              <h3>Autónomos y comercios locales</h3>
+              <p>Presencia clara y funcional para captar clientes y gestionar reservas/consultas.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA final -->
+      <section id="cta-final" class="section section--cta" aria-label="Llamada a la acción final">
+        <div class="container cta">
+          <div class="cta__inner">
+            <h2>Listo para transformar tu presencia digital?</h2>
+            <p>Pide una propuesta personalizada y descubre cómo podemos ayudar a tu negocio.</p>
+            <div class="cta__actions">
+              <a href="#contacto" class="btn btn--primary btn--lg">Solicitar propuesta</a>
+              <a href="#portfolio" class="btn btn--ghost">Ver portfolio</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer moderno -->
+      <footer id="contacto" class="footer" role="contentinfo" aria-label="Pie de página y contacto">
+        <div class="container footer__inner">
+          <div class="footer__brand">
+            <a href="/" aria-label="Sama's Webs">
+              <strong>Sama's Webs</strong>
+              <span>WEBSITES · LANDING PAGES · DIGITAL SOLUTIONS</span>
+            </a>
+          </div>
+
+          <nav class="footer__nav" aria-label="Enlaces del pie">
+            <ul>
+              <li><a href="#servicios">Servicios</a></li>
+              <li><a href="#por-que">Por qué</a></li>
+              <li><a href="#sectores">Sectores</a></li>
+              <li><a href="/privacy">Privacidad</a></li>
+            </ul>
+          </nav>
+
+          <div class="footer__contact">
+            <address class="contact-card">
+              <p>Email: <a href="mailto:info@example.com">info@example.com</a></p>
+              <p>Tel: <a href="tel:+000000000">+00 000 000 000</a></p>
+            </address>
+          </div>
+        </div>
+
+        <div class="container footer__meta">
+          <small>© <span id="year"></span> Sama's Webs — Todos los derechos reservados.</small>
+        </div>
+      </footer>
+    </main>
+
+  </body>
+</html>
