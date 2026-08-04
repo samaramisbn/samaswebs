@@ -2,15 +2,13 @@
 <html lang="es">
   <head>
     <!--
-      index.html para Sama's Webs
-      Diseño: minimalista, moderno, premium
-      Nota: Los colores de branding se deben definir en style.css como variables :root.
-      El logo opcional debe ubicarse en: assets/logo.png (colócalo tú si lo deseas)
+      index.html para Sama's Webs — versión mejorada
+      Diseño: premium, moderno, cercano. Paleta morada/lila aplicada en style.css
     -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="description" content="Sama's Webs — WEBSITES · LANDING PAGES · DIGITAL SOLUTIONS. Desarrollo de soluciones digitales para empresas y alojamientos turísticos." />
-    <title>Sama's Webs — Soluciones digitales para hacer crecer tu negocio</title>
+    <meta name="description" content="Sama's Webs — Soluciones sencillas y personalizadas para digitalizar pequeños negocios: webs, landing pages, reservas y guías digitales." />
+    <title>Sama's Webs — Tecnología sencilla para pequeños negocios</title>
 
     <!-- Tipografía moderna (Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,14 +20,11 @@
   </head>
 
   <body>
-    <!-- Skip link para accesibilidad -->
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
 
-    <!-- NAVBAR fija -->
     <header class="nav-wrapper" role="banner">
       <nav class="nav container" aria-label="Navegación principal">
         <div class="nav__brand">
-          <!-- Usar el logo en assets/logo.png si está disponible -->
           <a href="/" class="brand" aria-label="Sama's Webs - Inicio">
             <img src="assets/logo.png" alt="Sama's Webs" class="brand__logo" onerror="this.style.display='none'" />
             <div class="brand__text">
@@ -41,9 +36,9 @@
 
         <ul class="nav__links" role="menubar" aria-hidden="false">
           <li role="none"><a role="menuitem" href="#servicios">Servicios</a></li>
-          <li role="none"><a role="menuitem" href="#por-que">Por qué elegirnos</a></li>
+          <li role="none"><a role="menuitem" href="#por-que">Quiénes somos</a></li>
           <li role="none"><a role="menuitem" href="#sectores">Sectores</a></li>
-          <li role="none"><a role="menuitem" href="#portfolio">Portfolio</a></li>
+          <li role="none"><a role="menuitem" href="#como-trabajamos">Cómo trabajamos</a></li>
           <li role="none"><a role="menuitem" href="#contacto" class="btn btn--ghost">Contacto</a></li>
         </ul>
 
@@ -52,43 +47,39 @@
         </button>
       </nav>
 
-      <!-- Mobile menu (visible en pantallas pequeñas; controlado por script.js) -->
       <div id="mobile-menu" class="mobile-menu" hidden>
         <ul>
           <li><a href="#servicios">Servicios</a></li>
-          <li><a href="#por-que">Por qué elegirnos</a></li>
+          <li><a href="#por-que">Quiénes somos</a></li>
           <li><a href="#sectores">Sectores</a></li>
-          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#como-trabajamos">Cómo trabajamos</a></li>
           <li><a href="#contacto" class="btn btn--primary">Contacto</a></li>
         </ul>
       </div>
     </header>
 
-    <!-- HERO de pantalla completa -->
     <main id="main-content">
+      <!-- HERO -->
       <section class="hero hero--full" aria-label="Hero">
         <div class="container hero__inner">
           <div class="hero__content">
-            <h1 class="hero__title">
-              Soluciones digitales diseñadas para hacer crecer tu negocio.
-            </h1>
-            <p class="hero__subtitle">
-              Desarrollo de sitios web profesionales, landing pages y herramientas digitales que mejoran tu presencia online y la experiencia del cliente.
-            </p>
+            <h1 class="hero__title">La tecnología no tiene por qué ser complicada.</h1>
+            <p class="hero__subtitle">Creamos páginas web, landing pages, guías digitales y herramientas pensadas para facilitar la vida de tu negocio y mejorar la experiencia de tus clientes.</p>
 
             <div class="hero__ctas">
-              <a href="#contacto" class="btn btn--primary" data-analytics="cta-contact">Solicitar presupuesto</a>
-              <a href="#portfolio" class="btn btn--secondary" data-analytics="cta-portfolio">Ver trabajos</a>
+              <a href="#contacto" class="btn btn--primary btn--lg" data-analytics="cta-contact">Solicitar presupuesto</a>
+              <a href="#portfolio" class="btn btn--secondary" data-analytics="cta-portfolio">Ver proyectos</a>
             </div>
 
             <ul class="hero__highlights" aria-hidden="true">
-              <li class="card card--floating">Diseño moderno</li>
-              <li class="card card--floating">UX optimizado</li>
-              <li class="card card--floating">Rendimiento y SEO</li>
+              <li class="card card--floating">Diseños sencillos y efectivos</li>
+              <li class="card card--floating">Herramientas fáciles de usar</li>
+              <li class="card card--floating">Soporte cercano y directo</li>
             </ul>
           </div>
 
           <figure class="hero__visual" aria-hidden="true">
+            <!-- Placeholder visual: mockup con glassmorphism ligero -->
             <div class="mockup-glass">
               <div class="mockup__window">
                 <div class="mockup__header"></div>
@@ -99,73 +90,168 @@
         </div>
       </section>
 
-      <!-- Sección corta de Servicios / Cards informativas -->
+      <!-- QUIÉNES SOMOS -->
+      <section id="por-que" class="section" aria-label="Quiénes somos">
+        <div class="container">
+          <h2 class="section__title">Somos Sama's Webs</h2>
+          <p class="section__lead">Ayudamos a pequeños negocios a digitalizarse mediante soluciones sencillas, útiles y personalizadas. No somos una gran consultora: ofrecemos herramientas prácticas para que cualquier negocio mejore su presencia online sin complicaciones.</p>
+
+          <div class="grid grid--3 mt-2">
+            <div class="feature">
+              <h3>Diseño cercano</h3>
+              <p>Interfaces claras que comunican lo esencial y transmiten confianza.</p>
+            </div>
+            <div class="feature">
+              <h3>Soluciones útiles</h3>
+              <p>Webs, reservas, cartas digitales y guías pensadas para tu día a día.</p>
+            </div>
+            <div class="feature">
+              <h3>Soporte real</h3>
+              <p>Comunicación directa y tiempos de respuesta pensados para pymes.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUÉ HACEMOS -->
       <section id="servicios" class="section section--cards" aria-label="Servicios">
         <div class="container">
-          <h2 class="section__title">Qué hacemos</h2>
-          <p class="section__lead">Diseñamos y desarrollamos soluciones digitales adaptadas a tu sector y objetivos.</p>
+          <h2 class="section__title">Qué podemos hacer por tu negocio</h2>
+          <p class="section__lead">Soluciones prácticas y pensadas para pequeñas empresas y hostelería.</p>
 
-          <div class="cards">
+          <div class="cards mt-2">
             <article class="card">
-              <h3 class="card__title">Webs Corporativas</h3>
-              <p class="card__desc">Presencia institucional con foco en marca, performance y conversiones.</p>
+              <h3 class="card__title">Páginas web para negocios</h3>
+              <p class="card__desc">Presencia online clara, con foco en marca y conversiones.</p>
             </article>
 
             <article class="card">
               <h3 class="card__title">Landing Pages</h3>
-              <p class="card__desc">Páginas enfocadas en captación y ventas, optimizadas para campañas.</p>
+              <p class="card__desc">Páginas optimizadas para campañas y captación de clientes.</p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">Reservas y formularios</h3>
+              <p class="card__desc">Formularios que envían la información por email para gestionar reservas.</p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">Guías y cartas digitales</h3>
+              <p class="card__desc">QRs y cartas digitales para mejorar la experiencia del cliente.</p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">Mapas y vídeos</h3>
+              <p class="card__desc">Mapas interactivos y vídeos explicativos para tus clientes.</p>
             </article>
 
             <article class="card">
               <h3 class="card__title">Soluciones a medida</h3>
-              <p class="card__desc">Herramientas digitales (bookings, paneles, integraciones) pensadas para tu negocio.</p>
+              <p class="card__desc">Integraciones y herramientas personalizadas, sencillas y prácticas.</p>
             </article>
           </div>
         </div>
       </section>
 
-      <!-- "Por qué elegir Sama's Webs" -->
-      <section id="por-que" class="section section--why" aria-label="Por qué elegir Sama's Webs">
-        <div class="container">
-          <h2 class="section__title">Por qué elegir Sama's Webs</h2>
-          <div class="grid grid--3">
-            <div class="feature">
-              <h3>Atención personalizada</h3>
-              <p>Relación directa con el equipo para un proceso ágil y adaptado a tus necesidades.</p>
-            </div>
-            <div class="feature">
-              <h3>Calidad técnica</h3>
-              <p>Codebase optimizada, accesible y preparada para escalar.</p>
-            </div>
-            <div class="feature">
-              <h3>Diseño con propósito</h3>
-              <p>Interfaces limpias que comunican solidez y generan confianza.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Sección dirigida a empresas y alojamientos turísticos -->
+      <!-- SECTORES -->
       <section id="sectores" class="section section--sectors" aria-label="Sectores">
         <div class="container">
-          <h2 class="section__title">Sectores a los que servimos</h2>
+          <h2 class="section__title">Sectores con los que trabajamos</h2>
 
-          <div class="sectors">
+          <div class="sectors mt-2">
             <article class="sector-card">
-              <h3>Empresas y negocios</h3>
-              <p>Soluciones orientadas a marca, ventas B2B y generación de leads.</p>
+              <h3>Restaurantes y cafeterías</h3>
             </article>
-
             <article class="sector-card">
               <h3>Alojamientos turísticos</h3>
-              <p>Hoteles, apartamentos y alojamientos: reservas, integraciones y presencia que convierte.</p>
             </article>
-
             <article class="sector-card">
-              <h3>Autónomos y comercios locales</h3>
-              <p>Presencia clara y funcional para captar clientes y gestionar reservas/consultas.</p>
+              <h3>Comercios locales</h3>
+            </article>
+            <article class="sector-card">
+              <h3>Profesionales y autónomos</h3>
+            </article>
+            <article class="sector-card">
+              <h3>Casas rurales y hoteles</h3>
+            </article>
+            <article class="sector-card">
+              <h3>Servicios locales</h3>
             </article>
           </div>
+        </div>
+      </section>
+
+      <!-- CÓMO TRABAJAMOS -->
+      <section id="como-trabajamos" class="section" aria-label="Cómo trabajamos">
+        <div class="container">
+          <h2 class="section__title">Cómo trabajamos</h2>
+          <p class="section__lead">Proceso claro y cercano pensado para no complicar al cliente.</p>
+
+          <div class="grid grid--3 mt-2">
+            <div class="feature">
+              <h3>1. Charlamos</h3>
+              <p>Entendemos tu negocio y necesidades en una conversación cercana.</p>
+            </div>
+            <div class="feature">
+              <h3>2. Diseñamos</h3>
+              <p>Proponemos soluciones simples, visuales y enfocadas a resultados.</p>
+            </div>
+            <div class="feature">
+              <h3>3. Entregamos</h3>
+              <p>Implementamos y te entregamos algo fácil de gestionar y mantener.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACTO -->
+      <section id="contacto" class="section" aria-label="Contacto">
+        <div class="container">
+          <h2 class="section__title">Contacto</h2>
+          <p class="section__lead">Cuéntanos en pocas palabras tu proyecto y te responderemos con una propuesta clara.</p>
+
+          <form id="contact-form" class="contact-form" novalidate>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+              <label style="flex:1;min-width:180px">
+                <span class="muted">Nombre</span>
+                <input type="text" name="name" required placeholder="Tu nombre" />
+              </label>
+
+              <label style="flex:1;min-width:180px">
+                <span class="muted">Email</span>
+                <input type="email" name="email" required placeholder="tu@ejemplo.com" />
+              </label>
+            </div>
+
+            <div style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap;">
+              <label style="flex:1;min-width:180px">
+                <span class="muted">Negocio</span>
+                <input type="text" name="business" placeholder="Restaurante / Hotel / Tienda" />
+              </label>
+
+              <label style="flex:1;min-width:180px">
+                <span class="muted">Servicio interesado</span>
+                <select name="service">
+                  <option value="web">Página web</option>
+                  <option value="landing">Landing page</option>
+                  <option value="reservas">Sistema de reservas</option>
+                  <option value="qr">Guía / Carta digital</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </label>
+            </div>
+
+            <label style="display:block;margin-top:1rem;">
+              <span class="muted">Mensaje</span>
+              <textarea name="message" rows="5" placeholder="Cuéntanos brevemente en qué podemos ayudarte"></textarea>
+            </label>
+
+            <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+              <button type="submit" class="btn btn--primary">Enviar mensaje</button>
+              <button type="button" class="btn btn--ghost" id="contact-reset">Borrar</button>
+              <span id="contact-status" class="muted" aria-live="polite"></span>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -183,8 +269,8 @@
         </div>
       </section>
 
-      <!-- Footer moderno -->
-      <footer id="contacto" class="footer" role="contentinfo" aria-label="Pie de página y contacto">
+      <!-- Footer -->
+      <footer class="footer" role="contentinfo" aria-label="Pie de página y contacto">
         <div class="container footer__inner">
           <div class="footer__brand">
             <a href="/" aria-label="Sama's Webs">
@@ -196,7 +282,7 @@
           <nav class="footer__nav" aria-label="Enlaces del pie">
             <ul>
               <li><a href="#servicios">Servicios</a></li>
-              <li><a href="#por-que">Por qué</a></li>
+              <li><a href="#por-que">Quiénes somos</a></li>
               <li><a href="#sectores">Sectores</a></li>
               <li><a href="/privacy">Privacidad</a></li>
             </ul>
