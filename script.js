@@ -1,5 +1,5 @@
-// script.js — i18n robusto (traduce toda la página lo más posible) + galería, form, nav, smooth scroll
-// Reemplaza tu script.js por este. Recarga la página y prueba los idiomas ES / EN / JA.
+// script.js — i18n seguro (no hace reemplazos parciales peligrosos) + galería, form, nav, smooth scroll
+// Pega este archivo, guarda y fuerza recarga (Ctrl/Cmd+Shift+R).
 
 function encodeFormData(data) {
   return Object.keys(data)
@@ -8,7 +8,6 @@ function encodeFormData(data) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ===== TRANSLATIONS =====
   const TRANSLATIONS = {
     es: {
       "meta.title": "Sama's Webs — Tecnología sencilla para pequeños negocios",
@@ -114,23 +113,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ===== Helpers =====
+  // Normalization helpers
   function normalizeText(s) {
     if (!s) return '';
-    return s
-      .normalize('NFD')
+    return s.normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
-      .replace(/\u00A0/g, ' ')
-      .replace(/[\u2018\u2019\u201C\u201D]/g, '"')
-      .replace(/[\t\r\n]+/g, ' ')
-      .replace(/[.,;:!?¡¿«»"(){}\[\]]/g, '')
-      .replace(/\s+/g, ' ')
+      .replace(/\u00A0/g,' ')
+      .replace(/[\u2018\u2019\u201C\u201D]/g,'"')
+      .replace(/[\t\r\n]+/g,' ')
+      .replace(/[.,;:!?¡¿«»"(){}\[\]]/g,'')
+      .replace(/\s+/g,' ')
       .trim()
       .toLowerCase();
   }
-  function escapeRegExp(string){ return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function escapeRegExp(string){ return string.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 
-  // Build reverse mapping from Spanish originals to keys
+  // Build reverse mapping
   function buildReverseMap() {
     const base = TRANSLATIONS.es || {};
     const map = [];
@@ -141,12 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!norm) continue;
       map.push({ key, original, norm });
     }
-    // sort by phrase length desc to match long phrases first
     map.sort((a,b) => b.norm.length - a.norm.length);
     return map;
   }
 
-  // Apply deterministic data-i18n keys
+  // Apply data-i18n keys
   function applyDataI18n(lang) {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -157,10 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = value;
       else el.textContent = value;
     });
-    if (dict['meta.title']) document.title = dict['meta.title'];
+    if ((TRANSLATIONS[lang] || TRANSLATIONS.es)['meta.title']) document.title = (TRANSLATIONS[lang] || TRANSLATIONS.es)['meta.title'];
   }
 
-  // Translate attributes by matching normalized Spanish originals
+  // Translate attributes by exact/normalized matching
   function translateAttributes(reverseMap, dict) {
     const specs = [
       { selector: 'input[placeholder], textarea[placeholder]', attr: 'placeholder' },
@@ -174,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!raw) return;
         const n = normalizeText(raw);
         for (const entry of reverseMap) {
-          if (n === entry.norm || n.includes(entry.norm)) {
+          if (n === entry.norm) {
             const translated = dict[entry.key];
             if (translated) el.setAttribute(spec.attr, translated);
             break;
@@ -182,13 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
-    // translate select options
-    document.querySelectorAll('select option').forEach(opt => {
-      const raw = (opt.textContent || '').trim();
-      if (!raw) return;
+    // options
+    document.querySelectorAll('select option').forEach(opt=>{
+      const raw = (opt.textContent||'').trim();
+      if(!raw) return;
       const n = normalizeText(raw);
       for (const entry of reverseMap) {
-        if (n === entry.norm || n.includes(entry.norm)) {
+        if (n === entry.norm) {
           const translated = dict[entry.key];
           if (translated) opt.textContent = translated;
           break;
@@ -197,77 +194,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Replace occurrences inside a single Text node
-  function replaceInTextNode(textNode, entry, translation) {
-    const raw = textNode.nodeValue;
-    if (!raw || !raw.trim()) return false;
-    const re = new RegExp(escapeRegExp(entry.original), 'gi');
-    if (re.test(raw)) {
-      textNode.nodeValue = raw.replace(re, translation);
-      return true;
-    }
-    // fallback: normalized match (less precise)
-    const norm = normalizeText(raw);
-    if (norm && norm.includes(entry.norm)) {
-      // approximate replacement: replace normalized occurrence by translation — best-effort
-      // we'll do a case-insensitive replace using original words (loose)
-      const parts = entry.original.split(/\s+/).filter(Boolean);
-      if (parts.length) {
-        const patt = parts.map(p => escapeRegExp(p)).join('[\\s\\S]{0,6}');
-        const re2 = new RegExp(patt, 'i');
-        if (re2.test(raw)) {
-          textNode.nodeValue = raw.replace(re2, translation);
-          return true;
+  // Replace whole-element text only when it matches exactly (normalized) OR element is simple (only text nodes)
+  function translateElementsConservatively(reverseMap, dict) {
+    const candidates = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,button,a,label,span,small,div,section,article'));
+    candidates.forEach(el => {
+      if (el.closest && el.closest('[data-i18n]')) return; // skip already handled
+      // compute rendered text
+      const raw = (el.innerText || el.textContent || '').trim();
+      if (!raw || raw.length > 800) return;
+      const n = normalizeText(raw);
+
+      for (const entry of reverseMap) {
+        if (n === entry.norm) {
+          // If element has child elements heavier than inline (<img>, <svg>, etc.), avoid replacing innerHTML
+          const hasHeavyChildren = Array.from(el.children).some(c => !['SPAN','EM','STRONG','B','I','U','SMALL'].includes(c.tagName));
+          if (!hasHeavyChildren) {
+            // Safe to write translation to textContent
+            const translated = dict[entry.key];
+            if (translated) {
+              el.textContent = translated;
+            }
+          }
+          break; // once matched, stop for this element
         }
       }
-    }
-    return false;
-  }
-
-  // Replace across consecutive Text nodes under same parent (handles split text nodes)
-  function replaceAcrossTextNodes(parent, entry, translation) {
-    // collect child text nodes (only direct children) in order
-    const childNodes = Array.from(parent.childNodes);
-    const textNodeIndexes = [];
-    const textValues = [];
-    childNodes.forEach((n, idx) => {
-      if (n.nodeType === Node.TEXT_NODE) {
-        textNodeIndexes.push(idx);
-        textValues.push(n.nodeValue || '');
-      }
     });
-    if (!textValues.length) return false;
-    const joined = textValues.join('');
-    const re = new RegExp(escapeRegExp(entry.original), 'i');
-    const match = joined.match(re);
-    if (match) {
-      // simple approach: replace first occurrence within joined and then write result into first text node and remove following ones
-      const replaced = joined.replace(re, translation);
-      // set first text node to replaced and remove the rest text nodes in sequence
-      const firstIdx = textNodeIndexes[0];
-      childNodes[firstIdx].nodeValue = replaced;
-      // remove the other text nodes that we merged into first
-      for (let i = textNodeIndexes.length - 1; i >= 1; i--) {
-        const idx = textNodeIndexes[i];
-        const node = childNodes[idx];
-        if (node && node.parentNode) node.parentNode.removeChild(node);
-      }
-      return true;
-    }
-    return false;
   }
 
-  // Translate leaf text nodes (simple)
+  // Translate text nodes (leaf nodes) by exact normalized match
   function translateTextNodes(reverseMap, dict) {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
         if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
         const parent = node.parentNode;
         if (!parent) return NodeFilter.FILTER_REJECT;
-        // ignore nodes inside script/style/template
         if (parent.closest && parent.closest('script, style, template, noscript')) return NodeFilter.FILTER_REJECT;
-        // ignore nodes inside elements with data-i18n (already handled)
         if (parent.closest && parent.closest('[data-i18n]')) return NodeFilter.FILTER_REJECT;
+        // skip nodes that look like numbers/dates or very short tokens (to avoid noisy replacements)
+        const txt = node.nodeValue.trim();
+        if (txt.length < 2 || txt.length > 300) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
     }, false);
@@ -277,61 +242,20 @@ document.addEventListener('DOMContentLoaded', () => {
     while ((n = walker.nextNode())) nodes.push(n);
 
     nodes.forEach(textNode => {
+      const raw = textNode.nodeValue || '';
+      const norm = normalizeText(raw);
+      if (!norm) return;
       for (const entry of reverseMap) {
-        const translated = dict[entry.key];
-        if (!translated) continue;
-        const done = replaceInTextNode(textNode, entry, translated);
-        if (done) break;
-      }
-    });
-  }
-
-  // Translate non-leaf elements by replacing text in direct children sequences and by innerHTML fallback
-  function translateNonLeafElements(reverseMap, dict) {
-    const selectors = 'p, li, h1, h2, h3, h4, h5, h6, span, strong, a, button, label, small, div, section';
-    document.querySelectorAll(selectors).forEach(el => {
-      if (el.closest && el.closest('[data-i18n]')) return;
-      const inner = (el.innerText || el.textContent || '').trim();
-      if (!inner || inner.length > 800) return; // avoid very long blocks
-      const normInner = normalizeText(inner);
-      for (const entry of reverseMap) {
-        const translated = dict[entry.key];
-        if (!translated) continue;
-        if (normInner === entry.norm || normInner.includes(entry.norm)) {
-          // First try replacing across direct child text nodes
-          const replaced = replaceAcrossTextNodes(el, entry, translated);
-          if (replaced) break;
-          // Fallback: replace in innerHTML, but only replace occurrences outside of tags:
-          // Use a DOMRange approach: find text nodes and replace occurrences inside them.
-          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
-          let tn;
-          let made = false;
-          while ((tn = walker.nextNode())) {
-            try {
-              const re = new RegExp(escapeRegExp(entry.original), 'gi');
-              if (re.test(tn.nodeValue)) {
-                tn.nodeValue = tn.nodeValue.replace(re, translated);
-                made = true;
-              }
-            } catch (err) {}
-          }
-          if (made) break;
-          // Last-resort: innerHTML replace (best-effort)
-          try {
-            const reAll = new RegExp(escapeRegExp(entry.original), 'gi');
-            if (reAll.test(el.innerHTML)) {
-              el.innerHTML = el.innerHTML.replace(reAll, translated);
-              break;
-            }
-          } catch (err) {
-            // ignore
-          }
+        if (norm === entry.norm) {
+          const translated = (TRANSLATIONS[currentLang] || TRANSLATIONS.es)[entry.key];
+          if (translated) textNode.nodeValue = translated;
+          break;
         }
       }
     });
   }
 
-  // Main apply language function
+  // Apply language function
   let currentLang = localStorage.getItem('samaswebs:lang') || (navigator.language || 'es').slice(0,2);
   if (!['es','en','ja'].includes(currentLang)) currentLang = 'es';
   const statusEl = document.getElementById('contact-status');
@@ -339,41 +263,47 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyLanguage(lang) {
     currentLang = lang;
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
-    // 1) data-i18n (deterministic)
+
+    // 1) deterministic keys
     applyDataI18n(lang);
-    // 2) build reverse map
+
+    // 2) build reverseMap
     const reverseMap = buildReverseMap();
-    // 3) attributes & options
+
+    // 3) attributes and options (exact normalized matches only)
     translateAttributes(reverseMap, dict);
-    // 4) leaf text nodes
+
+    // 4) leaf text nodes (exact normalized matches only)
     translateTextNodes(reverseMap, dict);
-    // 5) non-leaf elements (try to cover elements with nested tags)
-    translateNonLeafElements(reverseMap, dict);
-    // 6) update dynamic status if present
+
+    // 5) conservative whole-element replacements for exact matches
+    translateElementsConservatively(reverseMap, dict);
+
+    // 6) update status messages if present
     if (statusEl && statusEl.dataset && statusEl.dataset.state) {
       const state = statusEl.dataset.state;
       if (state && dict[state]) statusEl.textContent = dict[state];
     }
-    // 7) update language buttons
+
+    // update language button states
     document.querySelectorAll('.lang-switch__btn').forEach(btn => {
       btn.setAttribute('aria-pressed', String(btn.getAttribute('data-lang') === lang));
     });
-    // persist
+
     localStorage.setItem('samaswebs:lang', lang);
   }
 
-  // Wire language buttons
+  // Bind language buttons
   document.querySelectorAll('.lang-switch__btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const lang = btn.getAttribute('data-lang');
-      applyLanguage(lang);
+      applyLanguage(btn.getAttribute('data-lang'));
     });
   });
 
   // Apply initial language
   applyLanguage(currentLang);
 
-  // ===== rest of behavior (unchanged) =====
+  // ===== rest: nav, smooth scroll, form, gallery (unchanged) =====
 
   // Auto-fill year
   const yearEl = document.getElementById('year');
@@ -395,7 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
         navToggle.focus();
       }
     });
-
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !mobileMenu.hasAttribute('hidden')) {
         mobileMenu.setAttribute('hidden', '');
@@ -403,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
         navToggle.focus();
       }
     });
-
     mobileMenu.addEventListener('click', (e) => {
       if (e.target.tagName === 'A') {
         mobileMenu.setAttribute('hidden', '');
@@ -430,22 +358,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Contact form handling
   const form = document.getElementById('contact-form');
   const resetBtn = document.getElementById('contact-reset');
-
   if (form) {
     const formEndpointMeta = document.querySelector('meta[name="form-endpoint"]');
     const formEndpoint = formEndpointMeta ? (formEndpointMeta.getAttribute('content') || '').trim() : '';
-
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!form.checkValidity()) { form.reportValidity(); return; }
-
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalText = submitBtn ? submitBtn.textContent : null;
       if (submitBtn) { submitBtn.disabled = true; submitBtn.classList.add('is-loading'); submitBtn.textContent = TRANSLATIONS[currentLang]?.['form.send'] || originalText || '...'; }
       if (statusEl) { statusEl.dataset.state = 'sending'; statusEl.textContent = TRANSLATIONS[currentLang]?.['sending'] || TRANSLATIONS.es['sending']; }
-
       const fd = new FormData(form); const data = {}; fd.forEach((v,k)=>data[k]=v);
-
       try {
         if (formEndpoint) {
           const resp = await fetch(formEndpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
@@ -460,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
           const bodyText = `Nombre: ${data.name || ''}\nEmail: ${data.email || ''}\nNegocio: ${data.business || ''}\nServicio: ${data.service || ''}\n\nMensaje:\n${data.message || ''}`;
           window.location.href = `mailto:ssamaramiss@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
         }
-
         if (statusEl) { statusEl.dataset.state = 'sent'; statusEl.textContent = TRANSLATIONS[currentLang]?.['sent'] || TRANSLATIONS.es['sent']; }
         form.reset();
       } catch (err) {
@@ -471,11 +393,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(()=>{ if (statusEl) { statusEl.textContent = ''; delete statusEl.dataset.state; } }, 7000);
       }
     });
-
-    if (resetBtn) resetBtn.addEventListener('click', () => { form.reset(); if (statusEl) statusEl.textContent = ''; });
+    if (resetBtn) resetBtn.addEventListener('click', ()=>{ form.reset(); if (statusEl) statusEl.textContent=''; });
   }
 
-  // Gallery init (3 slides)
+  // Gallery
   (function initGallery(){
     const INTERVAL = 5000;
     const gallery = document.getElementById('gallery');
@@ -498,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, INTERVAL);
   })();
 
-  // Optional: expose a function to list visible text items (useful to detect missing strings)
+  // Helper to copy visible strings for i18n debugging
   window.__collectVisibleTextForI18n = function() {
     const texts = new Set();
     function isVisible(el){
@@ -525,4 +446,4 @@ document.addEventListener('DOMContentLoaded', () => {
     return result;
   };
 
-}); // DOMContentLoaded end
+});
