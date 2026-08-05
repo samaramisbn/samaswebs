@@ -6,27 +6,15 @@
    - Variables cromadas para emblema
    - Variables legacy preservadas para compatibilidad (--color-bg, --color-surface)
 */
-/* Header logo — pseudo-element */
-.brand{
-  display:flex;
-  align-items:center;
-  gap:0.75rem;
-  position:relative;
-}
-.brand::before{
-  content: '';
+.brand img.brand__logo{
   width:56px;
   height:56px;
-  flex:0 0 56px;
+  object-fit:contain;
   border-radius:10px;
-  background-image: url('/LOGO.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  display:inline-block;
+  display:block;
 }
 @media (max-width:760px){
-  .brand::before{ width:40px; height:40px; flex:0 0 40px; }
+  .brand img.brand__logo{ width:40px; height:40px; }
   .brand__text{ display:none; }
 }
 
