@@ -157,4 +157,49 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
+    /* === Gallery autoplay (3 slides) ===
+     - Espera que exista #gallery con .gallery__slide[data-src="..."]
+     - Autoplay continuo cada 5000ms (5s)
+     - No pausa al hover
+  */
+  (function initGallery() {
+    const GALLERY_INTERVAL = 5000; // 5 segundos
+    const galleryInner = document.getElementById('gallery');
+    if (!galleryInner) return;
+
+    const slides = Array.from(galleryInner.querySelectorAll('.gallery__slide'));
+    if (!slides.length) return;
+
+    // precarga las imágenes y aplica background-image
+    slides.forEach(slide => {
+      const src = slide.getAttribute('data-src');
+      if (src) {
+        // preload
+        const img = new Image();
+        img.src = src;
+        // cuando cargue, aplicamos como background para evitar flashes
+        img.onload = () => {
+          slide.style.backgroundImage = `url('${src}')`;
+        };
+        // si falla, dejamos un color de respaldo (ya lo tiene CSS)
+      }
+    });
+
+    // Estado inicial
+    let current = 0;
+    slides.forEach((s, i) => {
+      s.classList.toggle('active', i === current);
+      s.setAttribute('aria-hidden', i === current ? 'false' : 'true');
+    });
+
+    // Autoplay continuo (no pausa en hover)
+    setInterval(() => {
+      const prev = current;
+      current = (current + 1) % slides.length;
+      slides[prev].classList.remove('active');
+      slides[prev].setAttribute('aria-hidden', 'true');
+      slides[current].classList.add('active');
+      slides[current].setAttribute('aria-hidden', 'false');
+    }, GALLERY_INTERVAL);
+  })();
 });
