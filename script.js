@@ -1,5 +1,5 @@
-// script.js — i18n mejorado (traduce todo lo traducible) + galería, form, nav, smooth scroll
-// Reemplaza completamente tu script.js por este y recarga (Ctrl/Cmd+Shift+R)
+// script.js — i18n robusto (traduce toda la página lo más posible) + galería, form, nav, smooth scroll
+// Reemplaza tu script.js por este. Recarga la página y prueba los idiomas ES / EN / JA.
 
 function encodeFormData(data) {
   return Object.keys(data)
@@ -9,7 +9,6 @@ function encodeFormData(data) {
 
 document.addEventListener('DOMContentLoaded', () => {
   // ===== TRANSLATIONS =====
-  // Añade / modifica entradas según necesites
   const TRANSLATIONS = {
     es: {
       "meta.title": "Sama's Webs — Tecnología sencilla para pequeños negocios",
@@ -115,42 +114,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ===== Utilities for normalization & matching =====
+  // ===== Helpers =====
   function normalizeText(s) {
     if (!s) return '';
     return s
-      .normalize('NFD')                       // decompose accents
-      .replace(/[\u0300-\u036f]/g, '')        // remove diacritics
-      .replace(/\u00A0/g, ' ')                // NBSP -> space
-      .replace(/[\u2018\u2019\u201C\u201D]/g, '"') // smart quotes -> normal
-      .replace(/[\t\r\n]+/g, ' ')             // whitespace collapse
-      .replace(/[.,;:!?¡¿«»"()\[\]]/g, '')    // remove common punctuation
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\u00A0/g, ' ')
+      .replace(/[\u2018\u2019\u201C\u201D]/g, '"')
+      .replace(/[\t\r\n]+/g, ' ')
+      .replace(/[.,;:!?¡¿«»"(){}\[\]]/g, '')
       .replace(/\s+/g, ' ')
       .trim()
       .toLowerCase();
   }
+  function escapeRegExp(string){ return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-  function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  // Build map of normalized Spanish phrase -> key & original Spanish text
+  // Build reverse mapping from Spanish originals to keys
   function buildReverseMap() {
-    const map = [];
     const base = TRANSLATIONS.es || {};
+    const map = [];
     for (const key in base) {
-      const original = (base[key] || '').trim();
+      const original = (base[key] || '').toString().trim();
       if (!original) continue;
       const norm = normalizeText(original);
       if (!norm) continue;
       map.push({ key, original, norm });
     }
-    // Sort by length descending so longer phrases match first
+    // sort by phrase length desc to match long phrases first
     map.sort((a,b) => b.norm.length - a.norm.length);
     return map;
   }
 
-  // Translate nodes using data-i18n attributes (deterministic)
+  // Apply deterministic data-i18n keys
   function applyDataI18n(lang) {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -158,16 +154,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!key) return;
       const value = dict[key];
       if (value === undefined) return;
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        el.placeholder = value;
-      } else {
-        el.textContent = value;
-      }
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = value;
+      else el.textContent = value;
     });
     if (dict['meta.title']) document.title = dict['meta.title'];
   }
 
-  // Translate attributes by matching normalized spanish original strings
+  // Translate attributes by matching normalized Spanish originals
   function translateAttributes(reverseMap, dict) {
     const specs = [
       { selector: 'input[placeholder], textarea[placeholder]', attr: 'placeholder' },
@@ -179,9 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll(spec.selector).forEach(el => {
         const raw = (el.getAttribute(spec.attr) || '').trim();
         if (!raw) return;
-        const rawNorm = normalizeText(raw);
+        const n = normalizeText(raw);
         for (const entry of reverseMap) {
-          if (rawNorm === entry.norm || rawNorm.includes(entry.norm)) {
+          if (n === entry.norm || n.includes(entry.norm)) {
             const translated = dict[entry.key];
             if (translated) el.setAttribute(spec.attr, translated);
             break;
@@ -189,14 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
-
-    // select options
+    // translate select options
     document.querySelectorAll('select option').forEach(opt => {
       const raw = (opt.textContent || '').trim();
       if (!raw) return;
-      const rawNorm = normalizeText(raw);
+      const n = normalizeText(raw);
       for (const entry of reverseMap) {
-        if (rawNorm === entry.norm || rawNorm.includes(entry.norm)) {
+        if (n === entry.norm || n.includes(entry.norm)) {
           const translated = dict[entry.key];
           if (translated) opt.textContent = translated;
           break;
@@ -205,153 +197,170 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Translate text nodes (TREE WALKER: SHOW_TEXT) using normalized matching
+  // Replace occurrences inside a single Text node
+  function replaceInTextNode(textNode, entry, translation) {
+    const raw = textNode.nodeValue;
+    if (!raw || !raw.trim()) return false;
+    const re = new RegExp(escapeRegExp(entry.original), 'gi');
+    if (re.test(raw)) {
+      textNode.nodeValue = raw.replace(re, translation);
+      return true;
+    }
+    // fallback: normalized match (less precise)
+    const norm = normalizeText(raw);
+    if (norm && norm.includes(entry.norm)) {
+      // approximate replacement: replace normalized occurrence by translation — best-effort
+      // we'll do a case-insensitive replace using original words (loose)
+      const parts = entry.original.split(/\s+/).filter(Boolean);
+      if (parts.length) {
+        const patt = parts.map(p => escapeRegExp(p)).join('[\\s\\S]{0,6}');
+        const re2 = new RegExp(patt, 'i');
+        if (re2.test(raw)) {
+          textNode.nodeValue = raw.replace(re2, translation);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // Replace across consecutive Text nodes under same parent (handles split text nodes)
+  function replaceAcrossTextNodes(parent, entry, translation) {
+    // collect child text nodes (only direct children) in order
+    const childNodes = Array.from(parent.childNodes);
+    const textNodeIndexes = [];
+    const textValues = [];
+    childNodes.forEach((n, idx) => {
+      if (n.nodeType === Node.TEXT_NODE) {
+        textNodeIndexes.push(idx);
+        textValues.push(n.nodeValue || '');
+      }
+    });
+    if (!textValues.length) return false;
+    const joined = textValues.join('');
+    const re = new RegExp(escapeRegExp(entry.original), 'i');
+    const match = joined.match(re);
+    if (match) {
+      // simple approach: replace first occurrence within joined and then write result into first text node and remove following ones
+      const replaced = joined.replace(re, translation);
+      // set first text node to replaced and remove the rest text nodes in sequence
+      const firstIdx = textNodeIndexes[0];
+      childNodes[firstIdx].nodeValue = replaced;
+      // remove the other text nodes that we merged into first
+      for (let i = textNodeIndexes.length - 1; i >= 1; i--) {
+        const idx = textNodeIndexes[i];
+        const node = childNodes[idx];
+        if (node && node.parentNode) node.parentNode.removeChild(node);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  // Translate leaf text nodes (simple)
   function translateTextNodes(reverseMap, dict) {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
-        // skip whitespace-only
         if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-        // skip text inside script/style, inputs, textareas, selects
         const parent = node.parentNode;
-        if (!parent || parent.closest && (parent.closest('script, style, textarea, input, select'))) return NodeFilter.FILTER_REJECT;
-        // don't touch nodes that are inside elements with data-i18n
-        if (parent && parent.closest && parent.closest('[data-i18n]')) return NodeFilter.FILTER_REJECT;
+        if (!parent) return NodeFilter.FILTER_REJECT;
+        // ignore nodes inside script/style/template
+        if (parent.closest && parent.closest('script, style, template, noscript')) return NodeFilter.FILTER_REJECT;
+        // ignore nodes inside elements with data-i18n (already handled)
+        if (parent.closest && parent.closest('[data-i18n]')) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
-    });
+    }, false);
 
     const nodes = [];
     let n;
     while ((n = walker.nextNode())) nodes.push(n);
 
     nodes.forEach(textNode => {
-      const raw = textNode.nodeValue;
-      const norm = normalizeText(raw);
-      if (!norm) return;
-
-      // Try exact normalized match first
       for (const entry of reverseMap) {
-        if (norm === entry.norm) {
-          const translated = dict[entry.key];
-          if (translated) {
-            textNode.nodeValue = translated;
-          }
-          return; // processed
-        }
-      }
-
-      // Try substring matches: replace occurrences of spanish original substrings with translated substrings
-      // We operate on the original raw string to preserve punctuation/casing where possible
-      let newText = raw;
-      let changed = false;
-      for (const entry of reverseMap) {
-        // attempt to find the original phrase in the raw text (case-insensitive)
-        const original = entry.original;
-        if (!original) continue;
-        const re = new RegExp(escapeRegExp(original), 'gi');
-        if (re.test(newText)) {
-          const translated = dict[entry.key] || original;
-          newText = newText.replace(re, translated);
-          changed = true;
-        } else {
-          // fallback: try matching normalized substring within normalized raw
-          const rawNorm = norm;
-          if (rawNorm.includes(entry.norm)) {
-            // find the original substring by searching split words; perform a best-effort replacement using regex for the words
-            // create pattern from entry.norm words
-            const words = entry.norm.split(' ').filter(Boolean);
-            if (words.length && words.length <= 6) {
-              // build fuzzy regex: match words with optional punctuation/spaces between
-              const patt = words.map(w => escapeRegExp(w)).join('[\\s\\S]{0,6}'); // allow small gap
-              const re2 = new RegExp(patt, 'i');
-              // Try to find a match in raw (original text)
-              const m = newText.match(re2);
-              if (m) {
-                const found = m[0];
-                const translated = dict[entry.key] || entry.original;
-                newText = newText.replace(found, translated);
-                changed = true;
-              }
-            }
-          }
-        }
-      }
-      if (changed) {
-        textNode.nodeValue = newText;
+        const translated = dict[entry.key];
+        if (!translated) continue;
+        const done = replaceInTextNode(textNode, entry, translated);
+        if (done) break;
       }
     });
   }
 
-  // Master function to apply language
+  // Translate non-leaf elements by replacing text in direct children sequences and by innerHTML fallback
+  function translateNonLeafElements(reverseMap, dict) {
+    const selectors = 'p, li, h1, h2, h3, h4, h5, h6, span, strong, a, button, label, small, div, section';
+    document.querySelectorAll(selectors).forEach(el => {
+      if (el.closest && el.closest('[data-i18n]')) return;
+      const inner = (el.innerText || el.textContent || '').trim();
+      if (!inner || inner.length > 800) return; // avoid very long blocks
+      const normInner = normalizeText(inner);
+      for (const entry of reverseMap) {
+        const translated = dict[entry.key];
+        if (!translated) continue;
+        if (normInner === entry.norm || normInner.includes(entry.norm)) {
+          // First try replacing across direct child text nodes
+          const replaced = replaceAcrossTextNodes(el, entry, translated);
+          if (replaced) break;
+          // Fallback: replace in innerHTML, but only replace occurrences outside of tags:
+          // Use a DOMRange approach: find text nodes and replace occurrences inside them.
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+          let tn;
+          let made = false;
+          while ((tn = walker.nextNode())) {
+            try {
+              const re = new RegExp(escapeRegExp(entry.original), 'gi');
+              if (re.test(tn.nodeValue)) {
+                tn.nodeValue = tn.nodeValue.replace(re, translated);
+                made = true;
+              }
+            } catch (err) {}
+          }
+          if (made) break;
+          // Last-resort: innerHTML replace (best-effort)
+          try {
+            const reAll = new RegExp(escapeRegExp(entry.original), 'gi');
+            if (reAll.test(el.innerHTML)) {
+              el.innerHTML = el.innerHTML.replace(reAll, translated);
+              break;
+            }
+          } catch (err) {
+            // ignore
+          }
+        }
+      }
+    });
+  }
+
+  // Main apply language function
+  let currentLang = localStorage.getItem('samaswebs:lang') || (navigator.language || 'es').slice(0,2);
+  if (!['es','en','ja'].includes(currentLang)) currentLang = 'es';
+  const statusEl = document.getElementById('contact-status');
+
   function applyLanguage(lang) {
-    const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
-    // update currentLang
     currentLang = lang;
-
-    // 1) deterministic keys
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
+    // 1) data-i18n (deterministic)
     applyDataI18n(lang);
-
     // 2) build reverse map
     const reverseMap = buildReverseMap();
-
-    // 3) translate attributes & options
+    // 3) attributes & options
     translateAttributes(reverseMap, dict);
-
-    // 4) translate text nodes
+    // 4) leaf text nodes
     translateTextNodes(reverseMap, dict);
-
-    // 5) update dynamic elements like status message if present
+    // 5) non-leaf elements (try to cover elements with nested tags)
+    translateNonLeafElements(reverseMap, dict);
+    // 6) update dynamic status if present
     if (statusEl && statusEl.dataset && statusEl.dataset.state) {
-      const state = statusEl.dataset.state; // e.g. 'sending' / 'sent' / 'error'
+      const state = statusEl.dataset.state;
       if (state && dict[state]) statusEl.textContent = dict[state];
     }
-
-    // 6) update language button aria-pressed
+    // 7) update language buttons
     document.querySelectorAll('.lang-switch__btn').forEach(btn => {
       btn.setAttribute('aria-pressed', String(btn.getAttribute('data-lang') === lang));
     });
-
     // persist
     localStorage.setItem('samaswebs:lang', lang);
   }
-
-  // Short helper to apply only data keys (used earlier)
-  function applyDataI18n(lang) {
-    const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (!key) return;
-      const value = dict[key];
-      if (value === undefined) return;
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        el.placeholder = value;
-      } else {
-        el.textContent = value;
-      }
-    });
-    if (dict['meta.title']) document.title = dict['meta.title'];
-  }
-
-  // Build reverse map helper (reused)
-  function buildReverseMap() {
-    const map = [];
-    const base = TRANSLATIONS.es || {};
-    for (const key in base) {
-      const original = (base[key] || '').trim();
-      if (!original) continue;
-      const norm = normalizeText(original);
-      if (!norm) continue;
-      map.push({ key, original, norm });
-    }
-    map.sort((a,b) => b.norm.length - a.norm.length);
-    return map;
-  }
-
-  // ===== Current language & statusEl reference (used for dynamic messages) =====
-  let currentLang = localStorage.getItem('samaswebs:lang') || (navigator.language || 'es').slice(0,2);
-  if (!['es','en','ja'].includes(currentLang)) currentLang = 'es';
-
-  const statusEl = document.getElementById('contact-status');
 
   // Wire language buttons
   document.querySelectorAll('.lang-switch__btn').forEach(btn => {
@@ -364,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Apply initial language
   applyLanguage(currentLang);
 
-  // ===== rest of behavior (unchanged-ish) =====
+  // ===== rest of behavior (unchanged) =====
 
   // Auto-fill year
   const yearEl = document.getElementById('year');
@@ -405,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Smooth scroll for internal links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
+    anchor.addEventListener('click', function (e) {
       const href = this.getAttribute('href');
       if (!href || href === '#' || href === '#0') return;
       const target = document.querySelector(href);
@@ -418,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Contact form handling (uses translations for status)
+  // Contact form handling
   const form = document.getElementById('contact-form');
   const resetBtn = document.getElementById('contact-reset');
 
@@ -440,12 +449,12 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         if (formEndpoint) {
           const resp = await fetch(formEndpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
-          if (!resp.ok) throw new Error('Error en endpoint: '+resp.status);
+          if (!resp.ok) throw new Error('Error en endpoint: ' + resp.status);
         } else if (form.hasAttribute('data-netlify')) {
           const payload = Object.assign({'form-name': form.getAttribute('name') || 'contact'}, data);
           const body = encodeFormData(payload);
           const resp = await fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
-          if (!resp.ok) throw new Error('Netlify submit failed: '+resp.status);
+          if (!resp.ok) throw new Error('Netlify submit failed: ' + resp.status);
         } else {
           const subject = encodeURIComponent('Contacto desde web — ' + (data.business || data.name || 'Sin nombre'));
           const bodyText = `Nombre: ${data.name || ''}\nEmail: ${data.email || ''}\nNegocio: ${data.business || ''}\nServicio: ${data.service || ''}\n\nMensaje:\n${data.message || ''}`;
@@ -459,15 +468,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statusEl) { statusEl.dataset.state = 'sendError'; statusEl.textContent = TRANSLATIONS[currentLang]?.['sendError'] || TRANSLATIONS.es['sendError']; }
       } finally {
         if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('is-loading'); submitBtn.textContent = originalText || (TRANSLATIONS[currentLang]?.['form.send'] || TRANSLATIONS.es['form.send']); }
-        setTimeout(()=>{ if (statusEl) { statusEl.textContent=''; delete statusEl.dataset.state; } }, 7000);
+        setTimeout(()=>{ if (statusEl) { statusEl.textContent = ''; delete statusEl.dataset.state; } }, 7000);
       }
     });
 
-    if (resetBtn) resetBtn.addEventListener('click', () => { form.reset(); if (statusEl) statusEl.textContent=''; });
-
+    if (resetBtn) resetBtn.addEventListener('click', () => { form.reset(); if (statusEl) statusEl.textContent = ''; });
   }
 
-  // Gallery init: set <img> src and autoplay (unchanged)
+  // Gallery init (3 slides)
   (function initGallery(){
     const INTERVAL = 5000;
     const gallery = document.getElementById('gallery');
@@ -489,5 +497,32 @@ document.addEventListener('DOMContentLoaded', () => {
       slides[current].classList.add('active'); slides[current].setAttribute('aria-hidden','false');
     }, INTERVAL);
   })();
+
+  // Optional: expose a function to list visible text items (useful to detect missing strings)
+  window.__collectVisibleTextForI18n = function() {
+    const texts = new Set();
+    function isVisible(el){
+      if (!el) return false;
+      if (el.closest && el.closest('script, style, noscript, template')) return false;
+      const style = getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity || 1) === 0) return false;
+      if (el.hasAttribute && el.hasAttribute('aria-hidden') && el.getAttribute('aria-hidden') === 'true') return false;
+      return el.offsetParent !== null || el.getClientRects().length > 0;
+    }
+    document.querySelectorAll('body *:not(script):not(style):not(noscript):not(template)').forEach(el => {
+      try {
+        if (!isVisible(el)) return;
+        const txt = (el.innerText || el.textContent || '').trim();
+        if (!txt) return;
+        if (txt.length < 2 || txt.length > 800) return;
+        const normalized = txt.replace(/\r/g,'').replace(/\n+/g,' ').replace(/\s+/g,' ').trim();
+        if (normalized) texts.add(normalized);
+      } catch (e) {}
+    });
+    const result = Array.from(texts).sort((a,b)=> a.length - b.length || a.localeCompare(b));
+    console.log('Visible text items for i18n:', result);
+    try { navigator.clipboard && navigator.clipboard.writeText && navigator.clipboard.writeText(JSON.stringify(result, null, 2)); } catch(e){}
+    return result;
+  };
 
 }); // DOMContentLoaded end
