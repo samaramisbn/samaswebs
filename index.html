@@ -3,13 +3,16 @@
   <head>
     <!--
       index.html — Sama's Webs
-      Header con logo (ruta relativa LOGO.png) y galería preparada para gallery/1.png, gallery/2.png, gallery/3.png
+      - Logo: LOGO.png en la raíz
+      - Galería: imágenes 1.png, 2.png, 3.png en la raíz
+      - Selector de idioma (ES / EN / 日本語)
+      - Textos preparados para i18n con data-i18n keys
     -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="description" content="Sama's Webs — Soluciones sencillas y personalizadas para digitalizar pequeños negocios: webs, landing pages, reservas y guías digitales." />
     <meta name="form-endpoint" content="https://formsubmit.co/ssamaramiss@gmail.com" />
-    <title>Sama's Webs — Tecnología sencilla para pequeños negocios</title>
+    <title data-i18n="meta.title">Sama's Webs — Tecnología sencilla para pequeños negocios</title>
 
     <!-- Tipografía -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,26 +28,33 @@
       <nav class="nav container" aria-label="Navegación principal">
         <div class="nav__brand">
           <a href="./" class="brand" aria-label="Sama's Webs - Inicio">
-            <!-- Ruta relativa (sin /) para evitar problemas en subpaths -->
             <img src="LOGO.png" alt="Sama's Webs" class="brand__logo" />
             <div class="brand__text">
               <strong class="brand__name">Sama's Webs</strong>
-              <span class="brand__tagline">WEBSITES · LANDING PAGES · DIGITAL SOLUTIONS</span>
+              <span class="brand__tagline" data-i18n="brand.tagline">WEBSITES · LANDING PAGES · DIGITAL SOLUTIONS</span>
             </div>
           </a>
         </div>
 
         <ul class="nav__links" role="menubar" aria-hidden="false">
-          <li role="none"><a role="menuitem" href="#servicios">Servicios</a></li>
-          <li role="none"><a role="menuitem" href="#por-que">Quiénes somos</a></li>
-          <li role="none"><a role="menuitem" href="#sectores">Sectores</a></li>
-          <li role="none"><a role="menuitem" href="#como-trabajamos">Cómo trabajamos</a></li>
-          <li role="none"><a role="menuitem" href="#contacto" class="btn btn--ghost">Contacto</a></li>
+          <li role="none"><a role="menuitem" href="#servicios" data-i18n="nav.services">Servicios</a></li>
+          <li role="none"><a role="menuitem" href="#por-que" data-i18n="nav.about">Quiénes somos</a></li>
+          <li role="none"><a role="menuitem" href="#sectores" data-i18n="nav.sectors">Sectores</a></li>
+          <li role="none"><a role="menuitem" href="#como-trabajamos" data-i18n="nav.process">Cómo trabajamos</a></li>
+          <li role="none"><a role="menuitem" href="#contacto" class="btn btn--ghost" data-i18n="nav.contact">Contacto</a></li>
         </ul>
 
-        <button class="nav__toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú">
-          <span class="hamburger" aria-hidden="true"></span>
-        </button>
+        <div class="nav__actions">
+          <div class="lang-switch" role="radiogroup" aria-label="Seleccionar idioma">
+            <button class="lang-switch__btn" data-lang="es" aria-pressed="true">ES</button>
+            <button class="lang-switch__btn" data-lang="en" aria-pressed="false">EN</button>
+            <button class="lang-switch__btn" data-lang="ja" aria-pressed="false">日本語</button>
+          </div>
+
+          <button class="nav__toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú">
+            <span class="hamburger" aria-hidden="true"></span>
+          </button>
+        </div>
       </nav>
 
       <div id="mobile-menu" class="mobile-menu" hidden>
@@ -59,15 +69,20 @@
     </header>
 
     <main id="main-content">
-      <!-- GALLERY: preparada para gallery/1.png, gallery/2.png, gallery/3.png -->
+      <!-- GALERÍA: usa imágenes en la raíz: 1.png, 2.png, 3.png -->
       <section class="gallery" aria-label="Galería">
         <div class="container">
           <div class="gallery__inner" id="gallery" aria-live="off">
-            <div class="gallery__slide" data-src="gallery/3.png" aria-hidden="true"></div>
-            <div class="gallery__slide" data-src="gallery/1.png" aria-hidden="true"></div>
-            <div class="gallery__slide" data-src="gallery/2.png" aria-hidden="true"></div>
+            <div class="gallery__slide" data-src="1.png" aria-hidden="true">
+              <img alt="Galería 1" class="gallery__img" />
+            </div>
+            <div class="gallery__slide" data-src="2.png" aria-hidden="true">
+              <img alt="Galería 2" class="gallery__img" />
+            </div>
+            <div class="gallery__slide" data-src="3.png" aria-hidden="true">
+              <img alt="Galería 3" class="gallery__img" />
+            </div>
             <div class="gallery__caption" id="gallery-caption" hidden></div>
-            <div class="gallery__controls" id="gallery-dots" aria-hidden="true"></div>
           </div>
         </div>
       </section>
@@ -76,18 +91,18 @@
       <section class="hero hero--full" aria-label="Hero">
         <div class="container hero__inner">
           <div class="hero__content">
-            <h1 class="hero__title">La tecnología no tiene por qué ser complicada.</h1>
-            <p class="hero__subtitle">Creamos páginas web, landing pages, guías digitales y herramientas pensadas para facilitar la vida de tu negocio y mejorar la experiencia de tus clientes.</p>
+            <h1 class="hero__title" data-i18n="hero.title">La tecnología no tiene por qué ser complicada.</h1>
+            <p class="hero__subtitle" data-i18n="hero.subtitle">Creamos páginas web, landing pages, guías digitales y herramientas pensadas para facilitar la vida de tu negocio y mejorar la experiencia de tus clientes.</p>
 
             <div class="hero__ctas">
-              <a href="#contacto" class="btn btn--primary btn--lg" data-analytics="cta-contact">Solicitar presupuesto</a>
-              <a href="#portfolio" class="btn btn--secondary" data-analytics="cta-portfolio">Ver proyectos</a>
+              <a href="#contacto" class="btn btn--primary btn--lg" data-i18n="cta.contact">Solicitar presupuesto</a>
+              <a href="#portfolio" class="btn btn--secondary" data-i18n="cta.portfolio">Ver proyectos</a>
             </div>
 
             <ul class="hero__highlights" aria-hidden="true">
-              <li class="card card--floating">Diseños sencillos y efectivos</li>
-              <li class="card card--floating">Herramientas fáciles de usar</li>
-              <li class="card card--floating">Soporte cercano y directo</li>
+              <li class="card card--floating" data-i18n="highlight.design">Diseños sencillos y efectivos</li>
+              <li class="card card--floating" data-i18n="highlight.tools">Herramientas fáciles de usar</li>
+              <li class="card card--floating" data-i18n="highlight.support">Soporte cercano y directo</li>
             </ul>
           </div>
 
@@ -105,8 +120,8 @@
       <!-- QUIÉNES SOMOS -->
       <section id="por-que" class="section" aria-label="Quiénes somos">
         <div class="container">
-          <h2 class="section__title">Somos Sama's Webs</h2>
-          <p class="section__lead">Ayudamos a pequeños negocios a digitalizarse mediante soluciones sencillas, útiles y personalizadas.</p>
+          <h2 class="section__title" data-i18n="about.title">Somos Sama's Webs</h2>
+          <p class="section__lead" data-i18n="about.lead">Ayudamos a pequeños negocios a digitalizarse mediante soluciones sencillas, útiles y personalizadas.</p>
 
           <div class="grid grid--3 mt-2">
             <div class="feature">
@@ -119,7 +134,7 @@
             </div>
             <div class="feature">
               <h3>Soporte real</h3>
-              <p>Comunicación directa y tiempos de respuesta pensados para pymes.</p>
+              <p>Comunicación directa y tiempos de respuesta adaptados a pymes.</p>
             </div>
           </div>
         </div>
@@ -128,8 +143,8 @@
       <!-- SERVICIOS -->
       <section id="servicios" class="section section--cards" aria-label="Servicios">
         <div class="container">
-          <h2 class="section__title">Qué podemos hacer por tu negocio</h2>
-          <p class="section__lead">Soluciones prácticas y pensadas para pequeñas empresas y hostelería.</p>
+          <h2 class="section__title" data-i18n="services.title">Qué podemos hacer por tu negocio</h2>
+          <p class="section__lead" data-i18n="services.lead">Soluciones prácticas y pensadas para pequeñas empresas y hostelería.</p>
 
           <div class="cards mt-2">
             <article class="card">
@@ -153,33 +168,33 @@
       <!-- CONTACTO -->
       <section id="contacto" class="section" aria-label="Contacto">
         <div class="container">
-          <h2 class="section__title">Contacto</h2>
-          <p class="section__lead">Cuéntanos en pocas palabras tu proyecto y te responderemos con una propuesta clara.</p>
+          <h2 class="section__title" data-i18n="contact.title">Contacto</h2>
+          <p class="section__lead" data-i18n="contact.lead">Cuéntanos en pocas palabras tu proyecto y te responderemos con una propuesta clara.</p>
 
           <form id="contact-form" class="contact-form" novalidate>
             <input type="hidden" name="_subject" value="Nuevo mensaje desde Sama's Webs" />
             <input type="hidden" name="_captcha" value="false" />
 
-            <div style="display:flex;gap:1rem;flex-wrap:wrap;">
-              <label style="flex:1;min-width:180px">
-                <span class="muted">Nombre</span>
+            <div class="form-row">
+              <label>
+                <span class="muted" data-i18n="form.name">Nombre</span>
                 <input type="text" name="name" required placeholder="Tu nombre" />
               </label>
 
-              <label style="flex:1;min-width:180px">
-                <span class="muted">Email</span>
+              <label>
+                <span class="muted" data-i18n="form.email">Email</span>
                 <input type="email" name="email" required placeholder="tu@ejemplo.com" />
               </label>
             </div>
 
-            <div style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap;">
-              <label style="flex:1;min-width:180px">
-                <span class="muted">Negocio</span>
+            <div class="form-row">
+              <label>
+                <span class="muted" data-i18n="form.business">Negocio</span>
                 <input type="text" name="business" placeholder="Restaurante / Hotel / Tienda" />
               </label>
 
-              <label style="flex:1;min-width:180px">
-                <span class="muted">Servicio interesado</span>
+              <label>
+                <span class="muted" data-i18n="form.service">Servicio interesado</span>
                 <select name="service">
                   <option value="web">Página web</option>
                   <option value="landing">Landing page</option>
@@ -191,13 +206,13 @@
             </div>
 
             <label style="display:block;margin-top:1rem;">
-              <span class="muted">Mensaje</span>
+              <span class="muted" data-i18n="form.message">Mensaje</span>
               <textarea name="message" rows="5" placeholder="Cuéntanos brevemente en qué podemos ayudarte"></textarea>
             </label>
 
-            <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
-              <button type="submit" class="btn btn--primary">Enviar mensaje</button>
-              <button type="button" class="btn btn--ghost" id="contact-reset">Borrar</button>
+            <div class="form-actions">
+              <button type="submit" class="btn btn--primary" data-i18n="form.send">Enviar mensaje</button>
+              <button type="button" class="btn btn--ghost" id="contact-reset" data-i18n="form.clear">Borrar</button>
               <span id="contact-status" class="muted" aria-live="polite"></span>
             </div>
           </form>
@@ -208,11 +223,11 @@
       <section id="cta-final" class="section section--cta" aria-label="Llamada a la acción final">
         <div class="container cta">
           <div class="cta__inner">
-            <h2>Listo para transformar tu presencia digital?</h2>
-            <p>Pide una propuesta personalizada y descubre cómo podemos ayudar a tu negocio.</p>
+            <h2 data-i18n="cta.final.title">Listo para transformar tu presencia digital?</h2>
+            <p data-i18n="cta.final.lead">Pide una propuesta personalizada y descubre cómo podemos ayudar a tu negocio.</p>
             <div class="cta__actions">
-              <a href="#contacto" class="btn btn--primary btn--lg">Solicitar propuesta</a>
-              <a href="#portfolio" class="btn btn--ghost">Ver portfolio</a>
+              <a href="#contacto" class="btn btn--primary btn--lg" data-i18n="cta.final.contact">Solicitar propuesta</a>
+              <a href="#portfolio" class="btn btn--ghost" data-i18n="cta.final.portfolio">Ver portfolio</a>
             </div>
           </div>
         </div>
