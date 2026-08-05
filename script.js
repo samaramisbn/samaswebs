@@ -3,7 +3,7 @@
 // - Smooth scroll para anclas
 // - Manejo del formulario con soporte para: Formspree (meta form-endpoint), Netlify Forms (data-netlify) y fallback mailto
 // - Auto-fill del año en el footer
-// - Feedback claro para el usuario y manejo de errores
+// - Galería autoplay preparada (3 slides, 5s)
 
 function encodeFormData(data) {
   return Object.keys(data)
@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // focus target for a11y
         target.setAttribute('tabindex', '-1');
         target.focus({ preventScroll: true });
       }
@@ -73,13 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetBtn = document.getElementById('contact-reset');
 
   if (form) {
-    // read optional endpoint from meta tag
     const formEndpointMeta = document.querySelector('meta[name="form-endpoint"]');
     const formEndpoint = formEndpointMeta ? (formEndpointMeta.getAttribute('content') || '').trim() : '';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      // basic native validation
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
@@ -94,25 +91,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (statusEl) statusEl.textContent = 'Enviando mensaje...';
 
-      // collect form data
       const fd = new FormData(form);
       const data = {};
       fd.forEach((v, k) => (data[k] = v));
 
       try {
         if (formEndpoint) {
-          // User provided an endpoint (e.g. Formspree)
-          // We POST JSON — many endpoints accept application/json. If yours requires form-encoded, change accordingly.
+          // POST JSON to provided endpoint (e.g. Formspree)
           const resp = await fetch(formEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
           });
-
           if (!resp.ok) throw new Error('Error en endpoint: ' + resp.status);
-
         } else if (form.hasAttribute('data-netlify')) {
-          // Netlify Forms: submit form-encoded to the same origin
+          // Netlify Forms
           const payload = Object.assign({ 'form-name': form.getAttribute('name') || 'contact' }, data);
           const body = encodeFormData(payload);
           const resp = await fetch('/', {
@@ -120,21 +113,16 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body,
           });
-
           if (!resp.ok) throw new Error('Netlify submit failed: ' + resp.status);
-
         } else {
-          // fallback: open mailto with prefilled subject/body
+          // mailto fallback
           const subject = encodeURIComponent('Contacto desde web — ' + (data.business || data.name || 'Sin nombre'));
-          const body = encodeURIComponent(`Nombre: ${data.name || ''}\nEmail: ${data.email || ''}\nNegocio: ${data.business || ''}\nServicio: ${data.service || ''}\n\nMensaje:\n${data.message || ''}`);
-          window.location.href = `mailto:info@example.com?subject=${subject}&body=${body}`;
-          // we consider this a success for UX
+          const bodyText = `Nombre: ${data.name || ''}\nEmail: ${data.email || ''}\nNegocio: ${data.business || ''}\nServicio: ${data.service || ''}\n\nMensaje:\n${data.message || ''}`;
+          window.location.href = `mailto:ssamaramiss@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
         }
 
-        // success
         if (statusEl) statusEl.textContent = 'Mensaje enviado. Te responderemos pronto.';
         form.reset();
-
       } catch (err) {
         console.error(err);
         if (statusEl) statusEl.textContent = 'Ocurrió un error al enviar. Intenta de nuevo.';
@@ -144,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
           submitBtn.classList.remove('is-loading');
           submitBtn.textContent = originalText;
         }
-        // clear status after a while
         setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 7000);
       }
     });
@@ -157,42 +144,39 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
-    /* === Gallery autoplay (3 slides) ===
-     - Espera que exista #gallery con .gallery__slide[data-src="..."]
+
+  /* === Gallery autoplay (3 slides) ===
+     - Espera #gallery con .gallery__slide[data-src="..."]
      - Autoplay continuo cada 5000ms (5s)
      - No pausa al hover
   */
   (function initGallery() {
-    const GALLERY_INTERVAL = 5000; // 5 segundos
+    const GALLERY_INTERVAL = 5000; // 5 seconds
     const galleryInner = document.getElementById('gallery');
     if (!galleryInner) return;
 
     const slides = Array.from(galleryInner.querySelectorAll('.gallery__slide'));
     if (!slides.length) return;
 
-    // precarga las imágenes y aplica background-image
+    // Preload images and set as background when ready
     slides.forEach(slide => {
       const src = slide.getAttribute('data-src');
       if (src) {
-        // preload
         const img = new Image();
         img.src = src;
-        // cuando cargue, aplicamos como background para evitar flashes
-        img.onload = () => {
-          slide.style.backgroundImage = `url('${src}')`;
-        };
-        // si falla, dejamos un color de respaldo (ya lo tiene CSS)
+        img.onload = () => { slide.style.backgroundImage = `url('${src}')`; };
+        img.onerror = () => { /* keep fallback background-color */ };
       }
     });
 
-    // Estado inicial
+    // initial state
     let current = 0;
     slides.forEach((s, i) => {
       s.classList.toggle('active', i === current);
       s.setAttribute('aria-hidden', i === current ? 'false' : 'true');
     });
 
-    // Autoplay continuo (no pausa en hover)
+    // autoplay
     setInterval(() => {
       const prev = current;
       current = (current + 1) % slides.length;
@@ -202,4 +186,5 @@ document.addEventListener('DOMContentLoaded', () => {
       slides[current].setAttribute('aria-hidden', 'false');
     }, GALLERY_INTERVAL);
   })();
+
 });

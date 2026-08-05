@@ -2,18 +2,16 @@
 <html lang="es">
   <head>
     <!--
-      index.html para Sama's Webs — versión mejorada
-      Diseño: premium, moderno, cercano. Paleta morada/lila aplicada en style.css
-      Cambios: skip-link eliminado (solicitado), logo visible arriba a la izquierda en header, preparado para móvil/tablet/desktop
+      index.html — Sama's Webs
+      Header con logo (ruta absoluta /LOGO.png) y galería preparada para /gallery/1.png, /gallery/2.png, /gallery/3.png
     -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="description" content="Sama's Webs — Soluciones sencillas y personalizadas para digitalizar pequeños negocios: webs, landing pages, reservas y guías digitales." />
-    <!-- Form endpoint: Formsubmit (envía a ssamaramiss@gmail.com) -->
     <meta name="form-endpoint" content="https://formsubmit.co/ssamaramiss@gmail.com" />
     <title>Sama's Webs — Tecnología sencilla para pequeños negocios</title>
 
-    <!-- Tipografía moderna (Inter) -->
+    <!-- Tipografía -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -23,12 +21,10 @@
   </head>
 
   <body>
-
     <header class="nav-wrapper" role="banner">
       <nav class="nav container" aria-label="Navegación principal">
         <div class="nav__brand">
           <a href="/" class="brand" aria-label="Sama's Webs - Inicio">
-            <!-- Use the root LOGO.png file (exact filename, case-sensitive) -->
             <img src="/LOGO.png" alt="Sama's Webs" class="brand__logo" />
             <div class="brand__text">
               <strong class="brand__name">Sama's Webs</strong>
@@ -62,15 +58,15 @@
     </header>
 
     <main id="main-content">
-      <!-- GALLERY: prepared for /gallery/1.png, /gallery/2.png, /gallery/3.png -->
+      <!-- GALLERY: preparada para /gallery/1.png, /gallery/2.png, /gallery/3.png -->
       <section class="gallery" aria-label="Galería">
         <div class="container">
-          <div class="gallery__inner" id="gallery">
+          <div class="gallery__inner" id="gallery" aria-live="off">
             <div class="gallery__slide" data-src="/gallery/1.png" aria-hidden="true"></div>
             <div class="gallery__slide" data-src="/gallery/2.png" aria-hidden="true"></div>
             <div class="gallery__slide" data-src="/gallery/3.png" aria-hidden="true"></div>
             <div class="gallery__caption" id="gallery-caption" hidden></div>
-            <div class="gallery__controls" id="gallery-dots" aria-hidden="false"></div>
+            <div class="gallery__controls" id="gallery-dots" aria-hidden="true"></div>
           </div>
         </div>
       </section>
@@ -80,7 +76,7 @@
         <div class="container hero__inner">
           <div class="hero__content">
             <h1 class="hero__title">La tecnología no tiene por qué ser complicada.</h1>
-            <p class="hero__subtitle">Creamos páginas web, landing pages, guías digitales y herramientas pensadas para facilitar la vida de tu negocio y mejorar la experiencia de tus clientes.</[...]
+            <p class="hero__subtitle">Creamos páginas web, landing pages, guías digitales y herramientas pensadas para facilitar la vida de tu negocio y mejorar la experiencia de tus clientes.</p>
 
             <div class="hero__ctas">
               <a href="#contacto" class="btn btn--primary btn--lg" data-analytics="cta-contact">Solicitar presupuesto</a>
@@ -95,7 +91,6 @@
           </div>
 
           <figure class="hero__visual" aria-hidden="true">
-            <!-- Placeholder visual: mockup con glassmorphism ligero -->
             <div class="mockup-glass">
               <div class="mockup__window">
                 <div class="mockup__header"></div>
@@ -110,7 +105,7 @@
       <section id="por-que" class="section" aria-label="Quiénes somos">
         <div class="container">
           <h2 class="section__title">Somos Sama's Webs</h2>
-          <p class="section__lead">Ayudamos a pequeños negocios a digitalizarse mediante soluciones sencillas, útiles y personalizadas. No somos una gran consultora: ofrecemos herramientas prác[...]
+          <p class="section__lead">Ayudamos a pequeños negocios a digitalizarse mediante soluciones sencillas, útiles y personalizadas.</p>
 
           <div class="grid grid--3 mt-2">
             <div class="feature">
@@ -129,7 +124,7 @@
         </div>
       </section>
 
-      <!-- QUÉ HACEMOS -->
+      <!-- SERVICIOS -->
       <section id="servicios" class="section section--cards" aria-label="Servicios">
         <div class="container">
           <h2 class="section__title">Qué podemos hacer por tu negocio</h2>
@@ -150,72 +145,6 @@
               <h3 class="card__title">Reservas y formularios</h3>
               <p class="card__desc">Formularios que envían la información por email para gestionar reservas.</p>
             </article>
-
-            <article class="card">
-              <h3 class="card__title">Guías y cartas digitales</h3>
-              <p class="card__desc">QRs y cartas digitales para mejorar la experiencia del cliente.</p>
-            </article>
-
-            <article class="card">
-              <h3 class="card__title">Mapas y vídeos</h3>
-              <p class="card__desc">Mapas interactivos y vídeos explicativos para tus clientes.</p>
-            </article>
-
-            <article class="card">
-              <h3 class="card__title">Soluciones a medida</h3>
-              <p class="card__desc">Integraciones y herramientas personalizadas, sencillas y prácticas.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- SECTORES -->
-      <section id="sectores" class="section section--sectors" aria-label="Sectores">
-        <div class="container">
-          <h2 class="section__title">Sectores con los que trabajamos</h2>
-
-          <div class="sectors mt-2">
-            <article class="sector-card">
-              <h3>Restaurantes y cafeterías</h3>
-            </article>
-            <article class="sector-card">
-              <h3>Alojamientos turísticos</h3>
-            </article>
-            <article class="sector-card">
-              <h3>Comercios locales</h3>
-            </article>
-            <article class="sector-card">
-              <h3>Profesionales y autónomos</h3>
-            </article>
-            <article class="sector-card">
-              <h3>Casas rurales y hoteles</h3>
-            </article>
-            <article class="sector-card">
-              <h3>Servicios locales</h3>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- CÓMO TRABAJAMOS -->
-      <section id="como-trabajamos" class="section" aria-label="Cómo trabajamos">
-        <div class="container">
-          <h2 class="section__title">Cómo trabajamos</h2>
-          <p class="section__lead">Proceso claro y cercano pensado para no complicar al cliente.</p>
-
-          <div class="grid grid--3 mt-2">
-            <div class="feature">
-              <h3>1. Charlamos</h3>
-              <p>Entendemos tu negocio y necesidades en una conversación cercana.</p>
-            </div>
-            <div class="feature">
-              <h3>2. Diseñamos</h3>
-              <p>Proponemos soluciones simples, visuales y enfocadas a resultados.</p>
-            </div>
-            <div class="feature">
-              <h3>3. Entregamos</h3>
-              <p>Implementamos y te entregamos algo fácil de gestionar y mantener.</p>
-            </div>
           </div>
         </div>
       </section>
@@ -227,7 +156,6 @@
           <p class="section__lead">Cuéntanos en pocas palabras tu proyecto y te responderemos con una propuesta clara.</p>
 
           <form id="contact-form" class="contact-form" novalidate>
-            <!-- Hidden helpers for Formsubmit (subject, captcha disable) -->
             <input type="hidden" name="_subject" value="Nuevo mensaje desde Sama's Webs" />
             <input type="hidden" name="_captcha" value="false" />
 
@@ -321,6 +249,5 @@
         </div>
       </footer>
     </main>
-
   </body>
 </html>
