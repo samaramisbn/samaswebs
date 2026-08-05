@@ -1,12 +1,20 @@
 <!doctype html>
 <html lang="es">
   <head>
+    <!--
+      index.html — Sama's Webs
+      - Logo: LOGO.png en la raíz
+      - Galería: imágenes 1.png, 2.png, 3.png en la raíz
+      - Selector de idioma (ES / EN)
+      - Textos preparados para i18n con data-i18n keys
+    -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="description" content="Sama's Webs — Soluciones sencillas y personalizadas para digitalizar pequeños negocios: webs, landing pages, reservas y guías digitales." />
     <meta name="form-endpoint" content="https://formsubmit.co/ssamaramiss@gmail.com" />
     <title data-i18n="meta.title">Sama's Webs — Tecnología sencilla para pequeños negocios</title>
 
+    <!-- Tipografía -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -40,7 +48,6 @@
           <div class="lang-switch" role="radiogroup" aria-label="Seleccionar idioma">
             <button class="lang-switch__btn" data-lang="es" aria-pressed="true">ES</button>
             <button class="lang-switch__btn" data-lang="en" aria-pressed="false">EN</button>
-            <button class="lang-switch__btn" data-lang="ja" aria-pressed="false">日本語</button>
           </div>
 
           <button class="nav__toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú">
@@ -70,14 +77,8 @@
 
             <div class="hero__ctas">
               <a href="#contacto" class="btn btn--primary btn--lg" data-i18n="cta.contact">Solicitar presupuesto</a>
-              <a href="#portfolio" class="btn btn--secondary" data-i18n="cta.portfolio">Ver proyectos</a>
             </div>
 
-            <ul class="hero__highlights" aria-hidden="true">
-              <li class="card card--floating" data-i18n="highlight.design">Diseños sencillos y efectivos</li>
-              <li class="card card--floating" data-i18n="highlight.tools">Herramientas fáciles de usar</li>
-              <li class="card card--floating" data-i18n="highlight.support">Soporte cercano y directo</li>
-            </ul>
           </div>
 
           <!-- Galería reducida a la derecha del hero -->
@@ -120,7 +121,7 @@
         </div>
       </section>
 
-      <!-- SERVICIOS -->
+      <!-- SERVICIOS (resto de la página mantiene su estructura) -->
       <section id="servicios" class="section section--cards" aria-label="Servicios">
         <div class="container">
           <h2 class="section__title" data-i18n="services.title">QUÉ PODEMOS HACER POR TU NEGOCIO</h2>
@@ -222,7 +223,6 @@
             <p data-i18n="cta.final.lead">Pide una propuesta personalizada y descubre cómo podemos ayudar a tu negocio.</p>
             <div class="cta__actions">
               <a href="#contacto" class="btn btn--primary btn--lg" data-i18n="cta.final.contact">Solicitar propuesta</a>
-              <a href="#portfolio" class="btn btn--ghost" data-i18n="cta.final.portfolio">Ver portfolio</a>
             </div>
           </div>
         </div>
@@ -249,8 +249,8 @@
 
           <div class="footer__contact">
             <address class="contact-card">
-              <p>Email: <a href="mailto:ssamaramiss@gmail.com">ssamaramiss@gmail.com</a></p>
-              <p>Tel: <a href="tel:+34624138614">+34 624 138 614</a></p>
+              <p><span data-i18n="footer.email">Email:</span> <a href="mailto:ssamaramiss@gmail.com">ssamaramiss@gmail.com</a></p>
+              <p><span data-i18n="footer.phone">Tel:</span> <a href="tel:+34624138614">+34 624 138 614</a></p>
             </address>
           </div>
         </div>
