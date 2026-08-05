@@ -1,20 +1,12 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <!--
-      index.html — Sama's Webs
-      - Logo: LOGO.png en la raíz
-      - Galería: imágenes 1.png, 2.png, 3.png en la raíz
-      - Selector de idioma (ES / EN / 日本語)
-      - Textos preparados para i18n con data-i18n keys
-    -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="description" content="Sama's Webs — Soluciones sencillas y personalizadas para digitalizar pequeños negocios: webs, landing pages, reservas y guías digitales." />
     <meta name="form-endpoint" content="https://formsubmit.co/ssamaramiss@gmail.com" />
     <title data-i18n="meta.title">Sama's Webs — Tecnología sencilla para pequeños negocios</title>
 
-    <!-- Tipografía -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -69,27 +61,9 @@
     </header>
 
     <main id="main-content">
-      <!-- GALERÍA: usa imágenes en la raíz: 1.png, 2.png, 3.png -->
-      <section class="gallery" aria-label="Galería">
-        <div class="container">
-          <div class="gallery__inner" id="gallery" aria-live="off">
-            <div class="gallery__slide" data-src="1.png" aria-hidden="true">
-              <img alt="Galería 1" class="gallery__img" />
-            </div>
-            <div class="gallery__slide" data-src="2.png" aria-hidden="true">
-              <img alt="Galería 2" class="gallery__img" />
-            </div>
-            <div class="gallery__slide" data-src="3.png" aria-hidden="true">
-              <img alt="Galería 3" class="gallery__img" />
-            </div>
-            <div class="gallery__caption" id="gallery-caption" hidden></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- HERO -->
+      <!-- HERO: texto a la izquierda, galería a la derecha -->
       <section class="hero hero--full" aria-label="Hero">
-        <div class="container hero__inner">
+        <div class="container hero__inner hero--gallery">
           <div class="hero__content">
             <h1 class="hero__title" data-i18n="hero.title">La tecnología no tiene por qué ser complicada.</h1>
             <p class="hero__subtitle" data-i18n="hero.subtitle">Creamos páginas web, landing pages, guías digitales y herramientas pensadas para facilitar la vida de tu negocio y mejorar la experiencia de tus clientes.</p>
@@ -106,14 +80,20 @@
             </ul>
           </div>
 
-          <figure class="hero__visual" aria-hidden="true">
-            <div class="mockup-glass">
-              <div class="mockup__window">
-                <div class="mockup__header"></div>
-                <div class="mockup__body"></div>
+          <!-- Galería reducida a la derecha del hero -->
+          <aside class="hero__visual" aria-hidden="false">
+            <div class="gallery__inner hero-gallery" id="gallery" aria-live="off">
+              <div class="gallery__slide" data-src="1.png" aria-hidden="true">
+                <img alt="Galería 1" class="gallery__img" />
+              </div>
+              <div class="gallery__slide" data-src="2.png" aria-hidden="true">
+                <img alt="Galería 2" class="gallery__img" />
+              </div>
+              <div class="gallery__slide" data-src="3.png" aria-hidden="true">
+                <img alt="Galería 3" class="gallery__img" />
               </div>
             </div>
-          </figure>
+          </aside>
         </div>
       </section>
 
@@ -123,17 +103,17 @@
           <h2 class="section__title" data-i18n="about.title">Somos Sama's Webs</h2>
           <p class="section__lead" data-i18n="about.lead">Ayudamos a pequeños negocios a digitalizarse mediante soluciones sencillas, útiles y personalizadas.</p>
 
-          <div class="grid grid--3 mt-2">
-            <div class="feature">
-              <h3>Diseño cercano</h3>
+          <div class="grid grid--3 mt-3 spaced-cards">
+            <div class="feature card">
+              <h3>DISEÑO CERCANO</h3>
               <p>Interfaces claras que comunican lo esencial y transmiten confianza.</p>
             </div>
-            <div class="feature">
-              <h3>Soluciones útiles</h3>
+            <div class="feature card">
+              <h3>SOLUCIONES ÚTILES</h3>
               <p>Webs, reservas, cartas digitales y guías pensadas para tu día a día.</p>
             </div>
-            <div class="feature">
-              <h3>Soporte real</h3>
+            <div class="feature card">
+              <h3>SOPORTE REAL</h3>
               <p>Comunicación directa y tiempos de respuesta adaptados a pymes.</p>
             </div>
           </div>
@@ -143,23 +123,38 @@
       <!-- SERVICIOS -->
       <section id="servicios" class="section section--cards" aria-label="Servicios">
         <div class="container">
-          <h2 class="section__title" data-i18n="services.title">Qué podemos hacer por tu negocio</h2>
+          <h2 class="section__title" data-i18n="services.title">QUÉ PODEMOS HACER POR TU NEGOCIO</h2>
           <p class="section__lead" data-i18n="services.lead">Soluciones prácticas y pensadas para pequeñas empresas y hostelería.</p>
 
-          <div class="cards mt-2">
+          <div class="cards mt-3 spaced-cards">
             <article class="card">
-              <h3 class="card__title">Páginas web para negocios</h3>
+              <h3 class="card__title">PÁGINAS WEB PARA NEGOCIOS</h3>
               <p class="card__desc">Presencia online clara, con foco en marca y conversiones.</p>
             </article>
 
             <article class="card">
-              <h3 class="card__title">Landing Pages</h3>
+              <h3 class="card__title">LANDING PAGES</h3>
               <p class="card__desc">Páginas optimizadas para campañas y captación de clientes.</p>
             </article>
 
             <article class="card">
-              <h3 class="card__title">Reservas y formularios</h3>
+              <h3 class="card__title">RESERVAS Y FORMULARIOS</h3>
               <p class="card__desc">Formularios que envían la información por email para gestionar reservas.</p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">GUÍAS Y CARTAS DIGITALES</h3>
+              <p class="card__desc">QRs y cartas digitales para mejorar la experiencia del cliente.</p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">MAPAS Y VÍDEOS</h3>
+              <p class="card__desc">Mapas interactivos y vídeos explicativos para tus clientes.</p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">SOLUCIONES A MEDIDA</h3>
+              <p class="card__desc">Integraciones y herramientas personalizadas, sencillas y prácticas.</p>
             </article>
           </div>
         </div>
@@ -168,7 +163,7 @@
       <!-- CONTACTO -->
       <section id="contacto" class="section" aria-label="Contacto">
         <div class="container">
-          <h2 class="section__title" data-i18n="contact.title">Contacto</h2>
+          <h2 class="section__title" data-i18n="contact.title">CONTACTO</h2>
           <p class="section__lead" data-i18n="contact.lead">Cuéntanos en pocas palabras tu proyecto y te responderemos con una propuesta clara.</p>
 
           <form id="contact-form" class="contact-form" novalidate>
@@ -223,7 +218,7 @@
       <section id="cta-final" class="section section--cta" aria-label="Llamada a la acción final">
         <div class="container cta">
           <div class="cta__inner">
-            <h2 data-i18n="cta.final.title">Listo para transformar tu presencia digital?</h2>
+            <h2 data-i18n="cta.final.title">LISTO PARA TRANSFORMAR TU PRESENCIA DIGITAL?</h2>
             <p data-i18n="cta.final.lead">Pide una propuesta personalizada y descubre cómo podemos ayudar a tu negocio.</p>
             <div class="cta__actions">
               <a href="#contacto" class="btn btn--primary btn--lg" data-i18n="cta.final.contact">Solicitar propuesta</a>
