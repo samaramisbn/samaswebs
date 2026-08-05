@@ -1,7 +1,5 @@
-// script.js — Sama's Webs (i18n ampliado: intenta traducir todo el texto visible)
-// - Traduce elementos con data-i18n y, además, busca coincidencias normalizadas en el DOM
-// - Traduce attributes: placeholder, alt, title, aria-label, option text
-// - Mantiene galería autoplay, form handling, mobile menu, smooth scroll
+// script.js — i18n mejorado (traduce todo lo traducible) + galería, form, nav, smooth scroll
+// Reemplaza completamente tu script.js por este y recarga (Ctrl/Cmd+Shift+R)
 
 function encodeFormData(data) {
   return Object.keys(data)
@@ -10,7 +8,8 @@ function encodeFormData(data) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ===== TRANSLATIONS (añadí claves para mensajes de estado) =====
+  // ===== TRANSLATIONS =====
+  // Añade / modifica entradas según necesites
   const TRANSLATIONS = {
     es: {
       "meta.title": "Sama's Webs — Tecnología sencilla para pequeños negocios",
@@ -43,8 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
       "sending": "Enviando mensaje...",
       "sent": "Mensaje enviado. Te responderemos pronto.",
       "sendError": "Ocurrió un error al enviar. Intenta de nuevo.",
-      "cta.final.title": "Listo para transformar tu presencia digital?",
-      "cta.final.lead": "Pide una propuesta personalizada y descubre cómo podemos ayudar a tu negocio.",
       "footer.email": "Email:",
       "footer.phone": "Tel:"
     },
@@ -79,8 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
       "sending": "Sending message...",
       "sent": "Message sent. We'll reply soon.",
       "sendError": "There was an error sending. Try again.",
-      "cta.final.title": "Ready to transform your digital presence?",
-      "cta.final.lead": "Request a personalised proposal and discover how we can help your business.",
       "footer.email": "Email:",
       "footer.phone": "Phone:"
     },
@@ -115,24 +110,48 @@ document.addEventListener('DOMContentLoaded', () => {
       "sending": "送信中...",
       "sent": "メッセージが送信されました。追って連絡します。",
       "sendError": "送信中にエラーが発生しました。もう一度お試しください。",
-      "cta.final.title": "デジタルプレゼンスを変えませんか？",
-      "cta.final.lead": "カスタム提案を依頼して、支援方法を見つけましょう。",
       "footer.email": "メール:",
       "footer.phone": "電話:"
     }
   };
 
-  // current language (kept in a variable for dynamic use)
-  let currentLang = localStorage.getItem('samaswebs:lang') || (navigator.language || 'es').slice(0,2);
-  if (!['es','en','ja'].includes(currentLang)) currentLang = 'es';
-
-  // helper: get translation value for current language, fallback to es or key
-  function t(key) {
-    return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.es && TRANSLATIONS.es[key]) || key;
+  // ===== Utilities for normalization & matching =====
+  function normalizeText(s) {
+    if (!s) return '';
+    return s
+      .normalize('NFD')                       // decompose accents
+      .replace(/[\u0300-\u036f]/g, '')        // remove diacritics
+      .replace(/\u00A0/g, ' ')                // NBSP -> space
+      .replace(/[\u2018\u2019\u201C\u201D]/g, '"') // smart quotes -> normal
+      .replace(/[\t\r\n]+/g, ' ')             // whitespace collapse
+      .replace(/[.,;:!?¡¿«»"()\[\]]/g, '')    // remove common punctuation
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
   }
 
-  // Apply explicit data-i18n keys first
-  function applyDataKeys(lang) {
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // Build map of normalized Spanish phrase -> key & original Spanish text
+  function buildReverseMap() {
+    const map = [];
+    const base = TRANSLATIONS.es || {};
+    for (const key in base) {
+      const original = (base[key] || '').trim();
+      if (!original) continue;
+      const norm = normalizeText(original);
+      if (!norm) continue;
+      map.push({ key, original, norm });
+    }
+    // Sort by length descending so longer phrases match first
+    map.sort((a,b) => b.norm.length - a.norm.length);
+    return map;
+  }
+
+  // Translate nodes using data-i18n attributes (deterministic)
+  function applyDataI18n(lang) {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
@@ -148,108 +167,146 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dict['meta.title']) document.title = dict['meta.title'];
   }
 
-  // Normalization used for fuzzy matching
-  function normalizeText(s) {
-    if (!s) return '';
-    return s
-      .replace(/\u00A0/g,' ')           // non-breaking spaces
-      .replace(/[\u2018\u2019\u201C\u201D]/g, '"') // smart quotes -> normal
-      .replace(/[.,;:!?¡¿«»"()]/g, '')  // remove punctuation
-      .replace(/\s+/g, ' ')             // collapse whitespace
-      .trim()
-      .toLowerCase();
-  }
-
-  // Build reverse lookup from normalized Spanish texts -> key
-  function buildReverseLookup() {
-    const reverse = {};
-    const base = TRANSLATIONS.es || {};
-    for (const key in base) {
-      const text = (base[key] || '').trim();
-      if (!text) continue;
-      const n = normalizeText(text);
-      if (n) reverse[n] = key;
-    }
-    return reverse;
-  }
-
-  // Translate attributes (placeholder, alt, title, aria-label) by normalized matching
-  function translateAttributes(reverse, dict) {
-    const attrSpecs = [
+  // Translate attributes by matching normalized spanish original strings
+  function translateAttributes(reverseMap, dict) {
+    const specs = [
       { selector: 'input[placeholder], textarea[placeholder]', attr: 'placeholder' },
       { selector: 'img[alt]', attr: 'alt' },
       { selector: '[title]', attr: 'title' },
       { selector: '[aria-label]', attr: 'aria-label' }
     ];
-    attrSpecs.forEach(spec => {
+    specs.forEach(spec => {
       document.querySelectorAll(spec.selector).forEach(el => {
         const raw = (el.getAttribute(spec.attr) || '').trim();
         if (!raw) return;
-        const key = reverse[normalizeText(raw)];
-        if (key && dict[key]) el.setAttribute(spec.attr, dict[key]);
+        const rawNorm = normalizeText(raw);
+        for (const entry of reverseMap) {
+          if (rawNorm === entry.norm || rawNorm.includes(entry.norm)) {
+            const translated = dict[entry.key];
+            if (translated) el.setAttribute(spec.attr, translated);
+            break;
+          }
+        }
       });
     });
 
-    // translate option text
+    // select options
     document.querySelectorAll('select option').forEach(opt => {
       const raw = (opt.textContent || '').trim();
       if (!raw) return;
-      const key = reverse[normalizeText(raw)];
-      if (key && dict[key]) opt.textContent = dict[key];
+      const rawNorm = normalizeText(raw);
+      for (const entry of reverseMap) {
+        if (rawNorm === entry.norm || rawNorm.includes(entry.norm)) {
+          const translated = dict[entry.key];
+          if (translated) opt.textContent = translated;
+          break;
+        }
+      }
     });
   }
 
-  // Translate leaf text nodes by normalized exact-match
-  function translateLeafTextNodes(reverse, dict) {
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT, {
+  // Translate text nodes (TREE WALKER: SHOW_TEXT) using normalized matching
+  function translateTextNodes(reverseMap, dict) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
-        // skip certain elements
-        if (node.matches && node.matches('script, style, textarea, input, select')) return NodeFilter.FILTER_REJECT;
-        if (node.hasAttribute && node.hasAttribute('data-i18n')) return NodeFilter.FILTER_REJECT;
-        // accept only leaf elements (no element children)
-        if (node.children && node.children.length === 0) return NodeFilter.FILTER_ACCEPT;
-        return NodeFilter.FILTER_SKIP;
+        // skip whitespace-only
+        if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        // skip text inside script/style, inputs, textareas, selects
+        const parent = node.parentNode;
+        if (!parent || parent.closest && (parent.closest('script, style, textarea, input, select'))) return NodeFilter.FILTER_REJECT;
+        // don't touch nodes that are inside elements with data-i18n
+        if (parent && parent.closest && parent.closest('[data-i18n]')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
       }
-    }, false);
+    });
 
-    let node;
-    while ((node = walker.nextNode())) {
-      try {
-        const el = node;
-        const raw = (el.textContent || '').trim();
-        if (!raw) continue;
-        // avoid very long blocks
-        if (raw.length > 300) continue;
-        const key = reverse[normalizeText(raw)];
-        if (key && dict[key]) {
-          el.textContent = dict[key];
+    const nodes = [];
+    let n;
+    while ((n = walker.nextNode())) nodes.push(n);
+
+    nodes.forEach(textNode => {
+      const raw = textNode.nodeValue;
+      const norm = normalizeText(raw);
+      if (!norm) return;
+
+      // Try exact normalized match first
+      for (const entry of reverseMap) {
+        if (norm === entry.norm) {
+          const translated = dict[entry.key];
+          if (translated) {
+            textNode.nodeValue = translated;
+          }
+          return; // processed
         }
-      } catch (err) {
-        // ignore
       }
-    }
+
+      // Try substring matches: replace occurrences of spanish original substrings with translated substrings
+      // We operate on the original raw string to preserve punctuation/casing where possible
+      let newText = raw;
+      let changed = false;
+      for (const entry of reverseMap) {
+        // attempt to find the original phrase in the raw text (case-insensitive)
+        const original = entry.original;
+        if (!original) continue;
+        const re = new RegExp(escapeRegExp(original), 'gi');
+        if (re.test(newText)) {
+          const translated = dict[entry.key] || original;
+          newText = newText.replace(re, translated);
+          changed = true;
+        } else {
+          // fallback: try matching normalized substring within normalized raw
+          const rawNorm = norm;
+          if (rawNorm.includes(entry.norm)) {
+            // find the original substring by searching split words; perform a best-effort replacement using regex for the words
+            // create pattern from entry.norm words
+            const words = entry.norm.split(' ').filter(Boolean);
+            if (words.length && words.length <= 6) {
+              // build fuzzy regex: match words with optional punctuation/spaces between
+              const patt = words.map(w => escapeRegExp(w)).join('[\\s\\S]{0,6}'); // allow small gap
+              const re2 = new RegExp(patt, 'i');
+              // Try to find a match in raw (original text)
+              const m = newText.match(re2);
+              if (m) {
+                const found = m[0];
+                const translated = dict[entry.key] || entry.original;
+                newText = newText.replace(found, translated);
+                changed = true;
+              }
+            }
+          }
+        }
+      }
+      if (changed) {
+        textNode.nodeValue = newText;
+      }
+    });
   }
 
-  // Main translation orchestration
+  // Master function to apply language
   function applyLanguage(lang) {
-    currentLang = lang;
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
+    // update currentLang
+    currentLang = lang;
 
-    // 1) explicit data-i18n keys
-    applyDataKeys(lang);
+    // 1) deterministic keys
+    applyDataI18n(lang);
 
-    // 2) build reverse mapping from normalized spanish strings -> key
-    const reverse = buildReverseLookup();
+    // 2) build reverse map
+    const reverseMap = buildReverseMap();
 
-    // 3) attributes and option texts
-    translateAttributes(reverse, dict);
+    // 3) translate attributes & options
+    translateAttributes(reverseMap, dict);
 
-    // 4) leaf text nodes
-    translateLeafTextNodes(reverse, dict);
+    // 4) translate text nodes
+    translateTextNodes(reverseMap, dict);
 
-    // 5) update any dynamic strings used by script (status messages)
-    // e.g. statusEl text management will use t('sending') etc in submit handler
-    // update language button state
+    // 5) update dynamic elements like status message if present
+    if (statusEl && statusEl.dataset && statusEl.dataset.state) {
+      const state = statusEl.dataset.state; // e.g. 'sending' / 'sent' / 'error'
+      if (state && dict[state]) statusEl.textContent = dict[state];
+    }
+
+    // 6) update language button aria-pressed
     document.querySelectorAll('.lang-switch__btn').forEach(btn => {
       btn.setAttribute('aria-pressed', String(btn.getAttribute('data-lang') === lang));
     });
@@ -258,7 +315,45 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('samaswebs:lang', lang);
   }
 
-  // Bind language buttons
+  // Short helper to apply only data keys (used earlier)
+  function applyDataI18n(lang) {
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (!key) return;
+      const value = dict[key];
+      if (value === undefined) return;
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = value;
+      } else {
+        el.textContent = value;
+      }
+    });
+    if (dict['meta.title']) document.title = dict['meta.title'];
+  }
+
+  // Build reverse map helper (reused)
+  function buildReverseMap() {
+    const map = [];
+    const base = TRANSLATIONS.es || {};
+    for (const key in base) {
+      const original = (base[key] || '').trim();
+      if (!original) continue;
+      const norm = normalizeText(original);
+      if (!norm) continue;
+      map.push({ key, original, norm });
+    }
+    map.sort((a,b) => b.norm.length - a.norm.length);
+    return map;
+  }
+
+  // ===== Current language & statusEl reference (used for dynamic messages) =====
+  let currentLang = localStorage.getItem('samaswebs:lang') || (navigator.language || 'es').slice(0,2);
+  if (!['es','en','ja'].includes(currentLang)) currentLang = 'es';
+
+  const statusEl = document.getElementById('contact-status');
+
+  // Wire language buttons
   document.querySelectorAll('.lang-switch__btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const lang = btn.getAttribute('data-lang');
@@ -266,10 +361,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // initial apply
+  // Apply initial language
   applyLanguage(currentLang);
 
-  // ===== rest of behavior =====
+  // ===== rest of behavior (unchanged-ish) =====
 
   // Auto-fill year
   const yearEl = document.getElementById('year');
@@ -310,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Smooth scroll for internal links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
+    anchor.addEventListener('click', function(e) {
       const href = this.getAttribute('href');
       if (!href || href === '#' || href === '#0') return;
       const target = document.querySelector(href);
@@ -323,9 +418,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Contact form handling (uses t('sending') etc for translated statuses)
+  // Contact form handling (uses translations for status)
   const form = document.getElementById('contact-form');
-  const statusEl = document.getElementById('contact-status');
   const resetBtn = document.getElementById('contact-reset');
 
   if (form) {
@@ -338,8 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalText = submitBtn ? submitBtn.textContent : null;
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.classList.add('is-loading'); submitBtn.textContent = t('form.send') || 'Enviando...'; }
-      if (statusEl) statusEl.textContent = t('sending');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.classList.add('is-loading'); submitBtn.textContent = TRANSLATIONS[currentLang]?.['form.send'] || originalText || '...'; }
+      if (statusEl) { statusEl.dataset.state = 'sending'; statusEl.textContent = TRANSLATIONS[currentLang]?.['sending'] || TRANSLATIONS.es['sending']; }
 
       const fd = new FormData(form); const data = {}; fd.forEach((v,k)=>data[k]=v);
 
@@ -358,26 +452,22 @@ document.addEventListener('DOMContentLoaded', () => {
           window.location.href = `mailto:ssamaramiss@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
         }
 
-        if (statusEl) statusEl.textContent = t('sent');
+        if (statusEl) { statusEl.dataset.state = 'sent'; statusEl.textContent = TRANSLATIONS[currentLang]?.['sent'] || TRANSLATIONS.es['sent']; }
         form.reset();
       } catch (err) {
         console.error(err);
-        if (statusEl) statusEl.textContent = t('sendError');
+        if (statusEl) { statusEl.dataset.state = 'sendError'; statusEl.textContent = TRANSLATIONS[currentLang]?.['sendError'] || TRANSLATIONS.es['sendError']; }
       } finally {
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('is-loading'); submitBtn.textContent = originalText || t('form.send'); }
-        setTimeout(()=>{ if (statusEl) statusEl.textContent=''; }, 7000);
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.classList.remove('is-loading'); submitBtn.textContent = originalText || (TRANSLATIONS[currentLang]?.['form.send'] || TRANSLATIONS.es['form.send']); }
+        setTimeout(()=>{ if (statusEl) { statusEl.textContent=''; delete statusEl.dataset.state; } }, 7000);
       }
     });
 
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        form.reset();
-        if (statusEl) statusEl.textContent = '';
-      });
-    }
+    if (resetBtn) resetBtn.addEventListener('click', () => { form.reset(); if (statusEl) statusEl.textContent=''; });
+
   }
 
-  // Gallery init: set <img> src and autoplay
+  // Gallery init: set <img> src and autoplay (unchanged)
   (function initGallery(){
     const INTERVAL = 5000;
     const gallery = document.getElementById('gallery');
@@ -400,4 +490,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }, INTERVAL);
   })();
 
-});
+}); // DOMContentLoaded end
