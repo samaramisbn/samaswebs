@@ -3,7 +3,7 @@
   <head>
     <!--
       index.html — Sama's Webs
-      Header con logo (ruta absoluta /LOGO.png) y galería preparada para /gallery/1.png, /gallery/2.png, /gallery/3.png
+      Header con logo (ruta relativa LOGO.png) y galería preparada para gallery/1.png, gallery/2.png, gallery/3.png
     -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -24,8 +24,9 @@
     <header class="nav-wrapper" role="banner">
       <nav class="nav container" aria-label="Navegación principal">
         <div class="nav__brand">
-          <a href="/" class="brand" aria-label="Sama's Webs - Inicio">
-            <img src="/LOGO.png" alt="Sama's Webs" class="brand__logo" />
+          <a href="./" class="brand" aria-label="Sama's Webs - Inicio">
+            <!-- Ruta relativa (sin /) para evitar problemas en subpaths -->
+            <img src="LOGO.png" alt="Sama's Webs" class="brand__logo" />
             <div class="brand__text">
               <strong class="brand__name">Sama's Webs</strong>
               <span class="brand__tagline">WEBSITES · LANDING PAGES · DIGITAL SOLUTIONS</span>
@@ -58,13 +59,13 @@
     </header>
 
     <main id="main-content">
-      <!-- GALLERY: preparada para /gallery/1.png, /gallery/2.png, /gallery/3.png -->
+      <!-- GALLERY: preparada para gallery/1.png, gallery/2.png, gallery/3.png -->
       <section class="gallery" aria-label="Galería">
         <div class="container">
           <div class="gallery__inner" id="gallery" aria-live="off">
-            <div class="gallery__slide" data-src="/gallery/2.png" aria-hidden="true"></div>
-            <div class="gallery__slide" data-src="/gallery/3.png" aria-hidden="true"></div>
-            <div class="gallery__slide" data-src="/gallery/1.png" aria-hidden="true"></div>
+            <div class="gallery__slide" data-src="gallery/3.png" aria-hidden="true"></div>
+            <div class="gallery__slide" data-src="gallery/1.png" aria-hidden="true"></div>
+            <div class="gallery__slide" data-src="gallery/2.png" aria-hidden="true"></div>
             <div class="gallery__caption" id="gallery-caption" hidden></div>
             <div class="gallery__controls" id="gallery-dots" aria-hidden="true"></div>
           </div>
@@ -221,7 +222,7 @@
       <footer class="footer" role="contentinfo" aria-label="Pie de página y contacto">
         <div class="container footer__inner">
           <div class="footer__brand">
-            <a href="/" aria-label="Sama's Webs">
+            <a href="./" aria-label="Sama's Webs">
               <strong>Sama's Webs</strong>
               <span>WEBSITES · LANDING PAGES · DIGITAL SOLUTIONS</span>
             </a>
